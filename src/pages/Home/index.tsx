@@ -1,5 +1,3 @@
-import "./home.css";
-
 import React from "react";
 
 import { CouncilSelect } from "@/components";
@@ -9,7 +7,7 @@ export default function Home() {
   const { council, setCouncil } = useSelectedCouncil();
 
   return (
-    <div style={{ backgroundColor: "black" }}>
+    <div>
       <CouncilSelect council={council} onChange={setCouncil} />
     </div>
   );
