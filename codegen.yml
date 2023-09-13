@@ -4,7 +4,7 @@ schema:
   - "https://query.joystream.org/graphql" # Pioneer
 
 documents:
-  - "./src/queries/**/*.gql"
+  - "./src/queries/graphql/*.gql"
 
 config:
   scalars:
@@ -15,8 +15,20 @@ config:
   nonOptionalTypename: true
 
 generates:
-  ./src/queries/qntypes.ts:
+  ./src/queries/__generated__/gql.ts:
     plugins:
       - typescript
       - typescript-operations
       - typescript-graphql-request
+  src/queries/__generated__/baseTypes.generated.ts:
+    plugins:
+      - typescript
+  src/queries/__generated__/:
+    preset: near-operation-file
+    presetConfig:
+      baseTypesPath: baseTypes.generated.ts
+      folder: ../__generated__
+      extension: .generated.tsx
+    plugins:
+      - typescript-operations
+      - typescript-react-apollo

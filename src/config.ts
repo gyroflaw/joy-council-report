@@ -1,5 +1,2 @@
-import { config } from "dotenv";
-
-config();
-
-export const QN_URL = process.env.QN_URL!;
+// TODO Env
+export const QN_URL = "https://query.joystream.org/graphql";
