@@ -1,0 +1,22 @@
+# Run codegen using: npm run generate
+# Make sure schema endpoint is accessible!
+schema:
+  - "https://query.joystream.org/graphql" # Pioneer
+
+documents:
+  - "./src/queries/**/*.gql"
+
+config:
+  scalars:
+    Date: Date
+    BigInt: string
+    Float: string
+  preResolveTypes: true # avoid using Pick
+  nonOptionalTypename: true
+
+generates:
+  ./src/queries/qntypes.ts:
+    plugins:
+      - typescript
+      - typescript-operations
+      - typescript-graphql-request

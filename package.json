@@ -1,0 +1,33 @@
+{
+  "name": "council-report",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "author": "",
+  "license": "ISC",
+  "scripts": {
+    "list-councils": "ts-node -r tsconfig-paths/register \"src/scripts/list-councils.ts\"",
+    "gen:1": "ts-node -r tsconfig-paths/register \"src/scripts/opt1.ts\"",
+    "gen:2": "ts-node -r tsconfig-paths/register \"src/scripts/opt2.ts\"",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "generate": "graphql-codegen"
+  },
+  "dependencies": {
+    "@graphql-codegen/cli": "^5.0.0",
+    "@graphql-codegen/typescript-graphql-request": "^5.0.0",
+    "@graphql-codegen/typescript-operations": "^4.0.1",
+    "@polkadot/util": "^12.4.2",
+    "bn.js": "^5.2.1",
+    "dotenv": "^16.3.1",
+    "graphql": "^16.8.0",
+    "graphql-request": "^6.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.6.0",
+    "eslint": "^8.49.0",
+    "prettier": "^3.0.3",
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.2.2"
+  }
+}
