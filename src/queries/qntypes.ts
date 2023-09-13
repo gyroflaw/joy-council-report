@@ -37426,6 +37426,34 @@ export type GetForumThreadsCountQueryVariables = Exact<{
 
 export type GetForumThreadsCountQuery = { __typename: 'Query', forumThreadsConnection: { __typename: 'ForumThreadConnection', totalCount: number } };
 
+export type MintedTokensQueryVariables = Exact<{
+  where?: InputMaybe<RewardPaymentEventWhereInput>;
+}>;
+
+
+export type MintedTokensQuery = { __typename: 'Query', rewardPaymentEvents: Array<{ __typename: 'RewardPaymentEvent', inBlock: number, councilMemberId: string, id: string, paidBalance: string, missingBalance: string, councilMember: { __typename: 'CouncilMember', electedInCouncilId: string, member: { __typename: 'Membership', id: string } } }> };
+
+export type WorkingGroupTokenQueryVariables = Exact<{
+  where?: InputMaybe<BudgetUpdatedEventWhereInput>;
+}>;
+
+
+export type WorkingGroupTokenQuery = { __typename: 'Query', budgetUpdatedEvents: Array<{ __typename: 'BudgetUpdatedEvent', groupId: string, budgetChangeAmount: string, inBlock: number, id: string }> };
+
+export type CouncilTokensQueryVariables = Exact<{
+  where?: InputMaybe<BudgetRefillEventWhereInput>;
+}>;
+
+
+export type CouncilTokensQuery = { __typename: 'Query', budgetRefillEvents: Array<{ __typename: 'BudgetRefillEvent', id: string, balance: string, inBlock: number }> };
+
+export type GetFundedQueryVariables = Exact<{
+  where?: InputMaybe<RequestFundedEventWhereInput>;
+}>;
+
+
+export type GetFundedQuery = { __typename: 'Query', requestFundedEvents: Array<{ __typename: 'RequestFundedEvent', id: string, amount: string }> };
+
 export type GetVideoCountQueryVariables = Exact<{
   where?: InputMaybe<VideoWhereInput>;
 }>;
@@ -38310,6 +38338,50 @@ export const GetForumThreadsCountDocument = gql`
   }
 }
     `;
+export const MintedTokensDocument = gql`
+    query mintedTokens($where: RewardPaymentEventWhereInput) {
+  rewardPaymentEvents(where: $where) {
+    inBlock
+    councilMemberId
+    id
+    paidBalance
+    missingBalance
+    councilMember {
+      electedInCouncilId
+      member {
+        id
+      }
+    }
+  }
+}
+    `;
+export const WorkingGroupTokenDocument = gql`
+    query workingGroupToken($where: BudgetUpdatedEventWhereInput) {
+  budgetUpdatedEvents(where: $where) {
+    groupId
+    budgetChangeAmount
+    inBlock
+    id
+  }
+}
+    `;
+export const CouncilTokensDocument = gql`
+    query councilTokens($where: BudgetRefillEventWhereInput) {
+  budgetRefillEvents(where: $where) {
+    id
+    balance
+    inBlock
+  }
+}
+    `;
+export const GetFundedDocument = gql`
+    query getFunded($where: RequestFundedEventWhereInput) {
+  requestFundedEvents(where: $where) {
+    id
+    amount
+  }
+}
+    `;
 export const GetVideoCountDocument = gql`
     query GetVideoCount($where: VideoWhereInput) {
   videosConnection(first: 0, where: $where) {
@@ -38617,6 +38689,18 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     GetForumThreadsCount(variables?: GetForumThreadsCountQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetForumThreadsCountQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetForumThreadsCountQuery>(GetForumThreadsCountDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'GetForumThreadsCount', 'query');
+    },
+    mintedTokens(variables?: MintedTokensQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<MintedTokensQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<MintedTokensQuery>(MintedTokensDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'mintedTokens', 'query');
+    },
+    workingGroupToken(variables?: WorkingGroupTokenQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<WorkingGroupTokenQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<WorkingGroupTokenQuery>(WorkingGroupTokenDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'workingGroupToken', 'query');
+    },
+    councilTokens(variables?: CouncilTokensQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<CouncilTokensQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<CouncilTokensQuery>(CouncilTokensDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'councilTokens', 'query');
+    },
+    getFunded(variables?: GetFundedQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetFundedQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetFundedQuery>(GetFundedDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getFunded', 'query');
     },
     GetVideoCount(variables?: GetVideoCountQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetVideoCountQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetVideoCountQuery>(GetVideoCountDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'GetVideoCount', 'query');
