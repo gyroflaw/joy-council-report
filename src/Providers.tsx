@@ -1,22 +1,23 @@
-import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
-import React from 'react';
+import React from "react";
+import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
+
+import { QN_URL } from "./config";
 
 const client = new ApolloClient({
-  // uri: import.meta.env.VITE_QN_URL,
-  uri: "https://query.joystream.org/graphql",
+  uri: QN_URL,
   cache: new InMemoryCache(),
   connectToDevTools: true,
   defaultOptions: {
     watchQuery: {
-      fetchPolicy: 'cache-and-network',
-      errorPolicy: 'all',
+      fetchPolicy: "cache-and-network",
+      errorPolicy: "all",
     },
     query: {
-      fetchPolicy: 'standby',
-      errorPolicy: 'all',
+      fetchPolicy: "standby",
+      errorPolicy: "all",
     },
     mutate: {
-      errorPolicy: 'all',
+      errorPolicy: "all",
     },
   },
 });

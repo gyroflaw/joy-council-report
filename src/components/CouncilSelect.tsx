@@ -37,9 +37,9 @@ export default function CouncilSelect({
   const { data } = useElectedCouncils({});
 
   return (
-    <div>
-      <div className="justify-content-center">
-        <span>Choose council &nbsp;</span>
+    <div className="justify-content-center">
+      <h3>Choose council </h3>
+      {data ? (
         <Select
           id="council"
           className="select_input"
@@ -51,19 +51,21 @@ export default function CouncilSelect({
           }
           components={{ SingleValue, Option }}
         />
-        {council && (
-          <>
-            <span className="time_label">
-              Elected: <BlockTime block={council.electedAt} />
+      ) : (
+        <>Loading...</>
+      )}
+      {council && (
+        <>
+          <span className="time_label">
+            Elected: <BlockTime block={council.electedAt} />
+          </span>
+          {council.endedAt && (
+            <span>
+              &nbsp;Ended: <BlockTime block={council.endedAt} />
             </span>
-            {council.endedAt && (
-              <span>
-                Ended: <BlockTime block={council.endedAt} />
-              </span>
-            )}
-          </>
-        )}
-      </div>
+          )}
+        </>
+      )}
     </div>
   );
 }
