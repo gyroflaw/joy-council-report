@@ -1,5 +1,5 @@
 import { lowerFirstLetter } from "@/helpers";
-import { ProposalFieldsFragment } from "@/queries/qntypes";
+import { ProposalFieldsFragment } from "@/queries";
 
 import { asMember, Member } from "./Member";
 

@@ -1,4 +1,4 @@
-import * as Types from "@/queries/qntypes";
+import * as Types from "@/queries";
 
 import { isNumber } from "./utils";
 

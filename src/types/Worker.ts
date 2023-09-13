@@ -5,7 +5,7 @@ import {
   PastWorkerFieldsFragment,
   WorkerDetailedFieldsFragment,
   WorkerFieldsFragment,
-} from "@/queries/qntypes";
+} from "@/queries";
 
 import { Address, asBlock, Block, castQueryResult } from "./common";
 import { asMember, Member } from "./Member";
