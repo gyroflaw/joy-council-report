@@ -1,31 +1,11 @@
 import React from "react";
-import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
+import { ApolloProvider } from "@apollo/client";
 
-import { QN_URL } from "./config";
-import { RpcProvider } from "./contexts";
-
-const client = new ApolloClient({
-  uri: QN_URL,
-  cache: new InMemoryCache(),
-  connectToDevTools: true,
-  defaultOptions: {
-    watchQuery: {
-      fetchPolicy: "cache-and-network",
-      errorPolicy: "all",
-    },
-    query: {
-      fetchPolicy: "standby",
-      errorPolicy: "all",
-    },
-    mutate: {
-      errorPolicy: "all",
-    },
-  },
-});
+import { RpcProvider, graphqlClient } from "./contexts";
 
 export default function Providers({ children }: React.PropsWithChildren) {
   return (
-    <ApolloProvider client={client}>
+    <ApolloProvider client={graphqlClient}>
       <RpcProvider>{children}</RpcProvider>
     </ApolloProvider>
   );
