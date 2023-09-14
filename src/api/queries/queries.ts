@@ -38,16 +38,14 @@ export const getElectedCouncilById = async (
   return asElectedCouncil(council.electedCouncils[0]);
 };
 
-export const getWorkingGroups = async (
-  _council: ElectedCouncil
-): Promise<WorkingGroup[]> => {
+export const getWorkingGroups = async (): Promise<WorkingGroup[]> => {
   const { GetWorkingGroups } = getSdk(client);
   const workingGroups = await GetWorkingGroups();
   return workingGroups.workingGroups.map(asWorkingGroup);
 };
 
-export const getWorkingGroupBudget = async (council: ElectedCouncil) => {
-  const workingGroups = await getWorkingGroups(council);
+export const getWorkingGroupBudget = async (start: Date, end: Date) => {
+  const workingGroups = await getWorkingGroups();
   const { GetBudgetSpending } = getSdk(client);
 
   // calculate working group budgets
@@ -58,8 +56,8 @@ export const getWorkingGroupBudget = async (council: ElectedCouncil) => {
     const budgets = await GetBudgetSpending({
       where: {
         group: { id_eq: workingGroup.id },
-        createdAt_gte: council.electedAt.timestamp,
-        createdAt_lte: council.endedAt?.timestamp || undefined,
+        createdAt_gte: start,
+        createdAt_lte: end,
       },
     });
     const budget = budgets.budgetSpendingEvents.reduce(
@@ -74,18 +72,18 @@ export const getWorkingGroupBudget = async (council: ElectedCouncil) => {
 };
 
 //
-export const getCouncilVideoStatus = async (council: ElectedCouncil) => {
+export const getVideoStatus = async (start: Date, end: Date) => {
   const { GetVideoCount } = getSdk(client);
 
   const {
     videosConnection: { totalCount: startCount },
   } = await GetVideoCount({
-    where: { createdAt_lte: council.electedAt.timestamp },
+    where: { createdAt_lte: start },
   });
   const {
     videosConnection: { totalCount: endCount },
   } = await GetVideoCount({
-    where: { createdAt_lte: council.endedAt?.timestamp || undefined },
+    where: { createdAt_lte: end },
   });
   const growthCount = endCount - startCount;
   const growthPercent = (growthCount / startCount) * 100;
@@ -98,15 +96,11 @@ export const getCouncilVideoStatus = async (council: ElectedCouncil) => {
   };
 };
 
-export const getCouncilVideoChartData = async (council: ElectedCouncil) => {
+export const getVideoChartData = async (start: Date, end: Date) => {
   const { GetVideoCount } = getSdk(client);
 
-  const startDate = new Date(
-    new Date(council.electedAt.timestamp).toDateString()
-  );
-  const endDate = new Date(
-    new Date(council.endedAt?.timestamp || Date.now()).toDateString()
-  );
+  const startDate = new Date(start.toDateString());
+  const endDate = new Date(end.toDateString());
 
   // iterate over days
   const data = [];
@@ -137,18 +131,18 @@ export const getCouncilVideoChartData = async (council: ElectedCouncil) => {
   return data;
 };
 
-export const getCouncilChannelStatus = async (council: ElectedCouncil) => {
+export const getChannelStatus = async (start: Date, end: Date) => {
   const { GetChannelsCount } = getSdk(client);
 
   const {
     channelsConnection: { totalCount: startCount },
   } = await GetChannelsCount({
-    where: { createdAt_lte: council.electedAt.timestamp },
+    where: { createdAt_lte: start },
   });
   const {
     channelsConnection: { totalCount: endCount },
   } = await GetChannelsCount({
-    where: { createdAt_lte: council.endedAt?.timestamp || undefined },
+    where: { createdAt_lte: end },
   });
   const growthCount = endCount - startCount;
   const growthPercent = (growthCount / startCount) * 100;
@@ -162,18 +156,18 @@ export const getCouncilChannelStatus = async (council: ElectedCouncil) => {
 };
 
 // TODO
-export const getCouncilMediaStatus = async (council: ElectedCouncil) => {
+export const getMediaStatus = async (start: Date, end: Date) => {
   const { GetChannelsCount } = getSdk(client);
 
   const {
     channelsConnection: { totalCount: startCount },
   } = await GetChannelsCount({
-    where: { createdAt_lte: council.electedAt.timestamp },
+    where: { createdAt_lte: start },
   });
   const {
     channelsConnection: { totalCount: endCount },
   } = await GetChannelsCount({
-    where: { createdAt_lte: council.endedAt?.timestamp || undefined },
+    where: { createdAt_lte: end },
   });
   const growthCount = endCount - startCount;
   const growthPercent = (growthCount / startCount) * 100;
@@ -186,18 +180,18 @@ export const getCouncilMediaStatus = async (council: ElectedCouncil) => {
   };
 };
 
-export const getCouncilVideoNftStatus = async (council: ElectedCouncil) => {
+export const getVideoNftStatus = async (start: Date, end: Date) => {
   const { GetNftIssuedCount } = getSdk(client);
 
   const {
     nftIssuedEventsConnection: { totalCount: startCount },
   } = await GetNftIssuedCount({
-    where: { createdAt_lte: council.electedAt.timestamp },
+    where: { createdAt_lte: start },
   });
   const {
     nftIssuedEventsConnection: { totalCount: endCount },
   } = await GetNftIssuedCount({
-    where: { createdAt_lte: council.endedAt?.timestamp || undefined },
+    where: { createdAt_lte: end },
   });
   const growthCount = endCount - startCount;
   const growthPercent = (growthCount / startCount) * 100;
@@ -210,18 +204,18 @@ export const getCouncilVideoNftStatus = async (council: ElectedCouncil) => {
   };
 };
 
-export const getCouncilMembershipStatus = async (council: ElectedCouncil) => {
+export const getMembershipStatus = async (start: Date, end: Date) => {
   const { GetMembersCount } = getSdk(client);
 
   const {
     membershipsConnection: { totalCount: startCount },
   } = await GetMembersCount({
-    where: { createdAt_lte: council.electedAt.timestamp },
+    where: { createdAt_lte: start },
   });
   const {
     membershipsConnection: { totalCount: endCount },
   } = await GetMembersCount({
-    where: { createdAt_lte: council.endedAt?.timestamp || undefined },
+    where: { createdAt_lte: end },
   });
   const growthCount = endCount - startCount;
   const growthPercent = (growthCount / startCount) * 100;
@@ -234,14 +228,15 @@ export const getCouncilMembershipStatus = async (council: ElectedCouncil) => {
   };
 };
 
-export const getCouncilProposals = async (
-  council: ElectedCouncil
+export const getProposals = async (
+  start: Date,
+  end: Date
 ): Promise<Proposal[]> => {
   const { getProposals } = getSdk(client);
   const { proposals } = await getProposals({
     where: {
-      createdAt_gt: council.electedAt.timestamp,
-      createdAt_lt: council.endedAt?.timestamp,
+      createdAt_gt: start,
+      createdAt_lt: end,
     },
   });
 

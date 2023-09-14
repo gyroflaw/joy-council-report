@@ -1,39 +1,55 @@
 import { ApiPromise } from "@polkadot/api";
 
-import { ElectedCouncil } from "@/types";
 import {
   getBalance,
   getBlockHash,
   getCouncilBudget,
-  getCouncilChannelStatus,
-  getCouncilMembershipStatus,
-  getCouncilProposals,
-  getCouncilVideoNftStatus,
-  getCouncilVideoStatus,
+  getChannelStatus,
+  getMembershipStatus,
+  getProposals,
+  getVideoNftStatus,
+  getVideoStatus,
   getTotalSupply,
   getWorkingGroupBudget,
 } from "@/api";
 import { MEXC_WALLET } from "@/config";
 import { toJoy } from "./bn";
 
-export async function generateReport(api: ApiPromise, council: ElectedCouncil) {
+export async function generateReport(
+  api: ApiPromise,
+  startBlockNumber: number,
+  endBlockNumber?: number
+) {
   // 1. https://github.com/0x2bc/council/blob/main/Automation_Council_and_Weekly_Reports.md#general-1
-  const startBlockHash = await getBlockHash(api, council.electedAt.number);
+  const startBlockHash = await getBlockHash(api, startBlockNumber);
+  const startBlockTimestamp = new Date(
+    (await (await api.at(startBlockHash)).query.timestamp.now()).toNumber()
+  );
+
+  // const blockHeader = await api.rpc.chain.getBlock(startBlockHash);
+
   const startBlock = {
-    number: council.electedAt.number,
+    number: startBlockNumber,
     hash: startBlockHash,
-    timestamp: council.electedAt.timestamp,
+    timestamp: startBlockTimestamp,
   };
-  const endBlockHash = council.endedAt
-    ? await getBlockHash(api, council.endedAt.number)
-    : undefined;
-  const endBlock = council.endedAt
-    ? {
-        number: council.endedAt.number,
-        hash: endBlockHash,
-        timestamp: council.endedAt.timestamp,
-      }
-    : undefined;
+
+  // If end block number isn't provided use current block number
+  if (!endBlockNumber) {
+    const blockHeader = await api.rpc.chain.getHeader();
+    const blockNumber = blockHeader.number.toNumber();
+    endBlockNumber = blockNumber;
+  }
+
+  const endBlockHash = await getBlockHash(api, endBlockNumber);
+  const endBlockTimestamp = new Date(
+    (await (await api.at(endBlockHash)).query.timestamp.now()).toNumber()
+  );
+  const endBlock = {
+    number: endBlockNumber,
+    hash: endBlockHash,
+    timestamp: endBlockTimestamp,
+  };
 
   // 2. https://github.com/0x2bc/council/blob/main/Automation_Council_and_Weekly_Reports.md#issuance
   const startIssuance = toJoy(await getTotalSupply(api, startBlockHash));
@@ -61,25 +77,42 @@ export async function generateReport(api: ApiPromise, council: ElectedCouncil) {
   );
 
   // 7. https://github.com/0x2bc/council/blob/main/Automation_Council_and_Weekly_Reports.md#wg-budgets
-  const workingGroupBudget = await getWorkingGroupBudget(council);
+  const workingGroupBudget = await getWorkingGroupBudget(
+    startBlockTimestamp,
+    endBlockTimestamp
+  );
 
   // 8. https://github.com/0x2bc/council/blob/main/Automation_Council_and_Weekly_Reports.md#videos
-  const videoStatus = await getCouncilVideoStatus(council);
+  const videoStatus = await getVideoStatus(
+    startBlockTimestamp,
+    endBlockTimestamp
+  );
 
   // 9. https://github.com/0x2bc/council/blob/main/Automation_Council_and_Weekly_Reports.md#channels
-  const channelStatus = await getCouncilChannelStatus(council);
+  const channelStatus = await getChannelStatus(
+    startBlockTimestamp,
+    endBlockTimestamp
+  );
 
   // 10. https://github.com/0x2bc/council/blob/main/Automation_Council_and_Weekly_Reports.md#media-storage
   // TODO
 
   // 11. https://github.com/0x2bc/council/blob/main/Automation_Council_and_Weekly_Reports.md#video-nfts
-  const videoNftStatus = await getCouncilVideoNftStatus(council);
+  const videoNftStatus = await getVideoNftStatus(
+    startBlockTimestamp,
+    endBlockTimestamp
+  );
 
   // 12. https://github.com/0x2bc/council/blob/main/Automation_Council_and_Weekly_Reports.md#membership-1
-  const membershipStatus = await getCouncilMembershipStatus(council);
+  const membershipStatus = await getMembershipStatus(
+    startBlockTimestamp,
+    endBlockTimestamp
+  );
 
   // 13. https://github.com/0x2bc/council/blob/main/Automation_Council_and_Weekly_Reports.md#proposals
-  const proposals = (await getCouncilProposals(council)).map((p) => ({
+  const proposals = (
+    await getProposals(startBlockTimestamp, endBlockTimestamp)
+  ).map((p) => ({
     id: p.id,
     title: p.title,
     status: p.status,

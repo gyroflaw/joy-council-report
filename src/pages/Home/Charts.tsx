@@ -9,7 +9,7 @@ import {
   Bar,
 } from "recharts";
 
-import { getCouncilVideoChartData } from "@/api";
+import { getVideoChartData } from "@/api";
 import { useSelectedCouncil } from "@/store";
 
 type DailyData = {
@@ -24,7 +24,10 @@ export default function Charts() {
     (async () => {
       if (!council) return;
 
-      const data = await getCouncilVideoChartData(council);
+      const data = await getVideoChartData(
+        new Date(council.electedAt.timestamp),
+        council.endedAt ? new Date(council.endedAt.timestamp) : new Date()
+      );
       setData(data);
     })();
   }, [council]);

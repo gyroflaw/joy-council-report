@@ -20,7 +20,12 @@ export default function Home() {
   const generate = useCallback(async () => {
     if (!council || !api) return;
     setLoading(true);
-    const report = await generateReport(api, council);
+
+    const report = await generateReport(
+      api,
+      council.electedAt.number,
+      council.endedAt?.number
+    );
     setReport(report);
     setLoading(false);
   }, [api, council]);
