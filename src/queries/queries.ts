@@ -38,7 +38,7 @@ export const getElectedCouncilById = async (
 };
 
 export const getWorkingGroups = async (
-  council: ElectedCouncil
+  _council: ElectedCouncil
 ): Promise<WorkingGroup[]> => {
   const { GetWorkingGroups } = getSdk(client);
   const workingGroups = await GetWorkingGroups();
@@ -46,17 +46,13 @@ export const getWorkingGroups = async (
 };
 
 // TODO
-export const getCouncilBudget = async (
-  council: ElectedCouncil
-): Promise<any> => {
+export const getCouncilBudget = async (_council: ElectedCouncil) => {
   const councilBudgets = {};
 
   return councilBudgets;
 };
 
-export const getWorkingGroupBudget = async (
-  council: ElectedCouncil
-): Promise<any> => {
+export const getWorkingGroupBudget = async (council: ElectedCouncil) => {
   const workingGroups = await getWorkingGroups(council);
   const { GetBudgetSpending } = getSdk(client);
 

@@ -2,6 +2,7 @@ import React from "react";
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 
 import { QN_URL } from "./config";
+import { RpcProvider } from "./contexts";
 
 const client = new ApolloClient({
   uri: QN_URL,
@@ -23,5 +24,9 @@ const client = new ApolloClient({
 });
 
 export default function Providers({ children }: React.PropsWithChildren) {
-  return <ApolloProvider client={client}>{children}</ApolloProvider>;
+  return (
+    <ApolloProvider client={client}>
+      <RpcProvider>{children}</RpcProvider>
+    </ApolloProvider>
+  );
 }
