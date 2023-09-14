@@ -7,6 +7,6 @@ export async function getBlockHash(
 ): Promise<HexString> {
   // Get the block hash using the block number
   const hash = await api.rpc.chain.getBlockHash(blockNumber);
-  await api.disconnect();
+
   return hash.toHex();
 }

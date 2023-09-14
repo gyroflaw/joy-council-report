@@ -1,6 +1,6 @@
 import BN from "bn.js";
 
-import { CouncilMemberFieldsFragment } from "@/queries";
+import { CouncilMemberFieldsFragment } from "@/api/queries";
 
 import { asMember, Member } from "./Member";
 

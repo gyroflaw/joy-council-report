@@ -1,7 +1,10 @@
 import BN from "bn.js";
 
 import { sumStakes } from "@/helpers";
-import { WorkerFieldsFragment, WorkingGroupFieldsFragment } from "@/queries";
+import {
+  WorkerFieldsFragment,
+  WorkingGroupFieldsFragment,
+} from "@/api/queries";
 
 export const GroupIdToGroupParam = {
   contentWorkingGroup: "Content",

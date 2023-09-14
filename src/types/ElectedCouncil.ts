@@ -1,4 +1,4 @@
-import { ElectedCouncilFieldsFragment } from "@/queries";
+import { ElectedCouncilFieldsFragment } from "@/api/queries";
 
 import { asBlock, Block } from "./common/Block";
 import { asCouncilor, Councilor } from "./Councilor";

@@ -1,4 +1,4 @@
-import * as Types from "@/queries";
+import * as Types from "@/api/queries";
 
 import { isNumber } from "./utils";
 

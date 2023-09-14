@@ -45,13 +45,6 @@ export const getWorkingGroups = async (
   return workingGroups.workingGroups.map(asWorkingGroup);
 };
 
-// TODO
-export const getCouncilBudget = async (_council: ElectedCouncil) => {
-  const councilBudgets = {};
-
-  return councilBudgets;
-};
-
 export const getWorkingGroupBudget = async (council: ElectedCouncil) => {
   const workingGroups = await getWorkingGroups(council);
   const { GetBudgetSpending } = getSdk(client);

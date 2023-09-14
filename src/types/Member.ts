@@ -1,7 +1,7 @@
 import {
   MemberFieldsFragment,
   MembershipExternalResourceType,
-} from "@/queries";
+} from "@/api/queries";
 
 import { Address, asBlock, Block, castQueryResult } from "./common";
 import { asWorkingGroupName } from "./WorkingGroup";
