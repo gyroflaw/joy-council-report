@@ -1,6 +1,4 @@
-import React, { useCallback, useState } from "react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import React, { useCallback, useEffect, useState } from "react";
 import ReactJson from "react-json-view";
 
 import { CouncilSelect } from "@/components";
@@ -9,44 +7,61 @@ import { generateReport } from "@/helpers";
 import { useSelectedCouncil } from "@/store";
 import Charts from "./Charts";
 
-const content = `A paragraph with *emphasis* and **strong importance**.`;
-
 export default function Home() {
   const { council, setCouncil } = useSelectedCouncil();
   const { api, connectionState } = useRpc();
   const [report, setReport] = useState({});
   const [loading, setLoading] = useState(false);
+  const [startBlock, setStartBlock] = useState(0);
+  const [endBlock, setEndBlock] = useState(0);
+
+  useEffect(() => {
+    if (!council) return;
+    setStartBlock(council.electedAt.number);
+
+    if (council.endedAt) {
+      setEndBlock(council.endedAt.number);
+    }
+  }, [council]);
 
   const generate = useCallback(async () => {
-    if (!council || !api) return;
+    if (!api) return;
     setLoading(true);
 
-    const report = await generateReport(
-      api,
-      council.electedAt.number,
-      council.endedAt?.number
-    );
+    const report = await generateReport(api, startBlock, endBlock);
     setReport(report);
     setLoading(false);
-  }, [api, council]);
+  }, [api, startBlock, endBlock]);
 
   return (
     <div className="prose max-w-3xl m-auto mt-4">
-      <CouncilSelect council={council} onChange={setCouncil} />
       {api ? (
         <div>Connected to joystream node</div>
       ) : (
         <div>{connectionState}</div>
       )}
+      <CouncilSelect council={council} onChange={setCouncil} />
+
+      <label>Start block:</label>
+      <input
+        type="number"
+        value={startBlock}
+        onChange={(e) => setStartBlock(parseInt(e.target.value, 10))}
+      />
+      <label>End block:</label>
+      <input
+        type="number"
+        value={endBlock}
+        onChange={(e) => setEndBlock(parseInt(e.target.value, 10))}
+      />
       <button
-        className="btn mr-0 mt-5"
+        className="btn mr-0 my-5 mx-4"
         onClick={generate}
         disabled={!council || !api || loading}
       >
         {loading ? "Generating..." : "Generate report"}
       </button>
 
-      <ReactMarkdown children={content} remarkPlugins={[remarkGfm]} />
       <ReactJson src={report} theme="monokai" />
       <Charts />
     </div>

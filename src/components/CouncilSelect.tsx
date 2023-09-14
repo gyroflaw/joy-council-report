@@ -17,17 +17,26 @@ export interface CouncilSelectProps {
 
 const SingleValue = (singleValueProps: SingleValueProps<ElectedCouncil>) => {
   const {
-    data: { id },
+    data: { electionCycleId, id },
   } = singleValueProps;
 
   return (
-    <components.SingleValue {...singleValueProps}>{id}</components.SingleValue>
+    <components.SingleValue {...singleValueProps}>
+      {electionCycleId ?? id}
+    </components.SingleValue>
   );
 };
 
 const Option = (optionProps: OptionProps<ElectedCouncil>) => {
-  const { data } = optionProps;
-  return <components.Option {...optionProps}>{data.id}</components.Option>;
+  const {
+    data: { electionCycleId, id },
+  } = optionProps;
+  return (
+    <components.Option {...optionProps}>
+      {" "}
+      {electionCycleId ?? id}
+    </components.Option>
+  );
 };
 
 export default function CouncilSelect({
