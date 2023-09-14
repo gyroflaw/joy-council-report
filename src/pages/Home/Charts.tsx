@@ -8,8 +8,13 @@ import {
   Legend,
   Bar,
 } from "recharts";
+import ReactJson from "react-json-view";
 
-import { getVideoChartData } from "@/api";
+import {
+  getVideoChartData,
+  getChannelChartData,
+  getMembershipChartData,
+} from "@/api";
 import { useSelectedCouncil } from "@/store";
 
 type DailyData = {
@@ -17,24 +22,10 @@ type DailyData = {
   count: number;
 };
 
-export default function Charts() {
-  const { council } = useSelectedCouncil();
-  const [data, setData] = useState<DailyData[]>([]);
-  useEffect(() => {
-    (async () => {
-      if (!council) return;
-
-      const data = await getVideoChartData(
-        new Date(council.electedAt.timestamp),
-        council.endedAt ? new Date(council.endedAt.timestamp) : new Date()
-      );
-      setData(data);
-    })();
-  }, [council]);
-
+function JoyChart({ data, title }: { data: DailyData[]; title: string }) {
   return (
-    <div>
-      <h3>Videos uploaded</h3>
+    <div className="p-4">
+      <h3>{title}</h3>
       {data.length > 0 && (
         <BarChart width={730} height={250} data={data}>
           <CartesianGrid strokeDasharray="3 3" />
@@ -48,9 +39,48 @@ export default function Charts() {
           <YAxis />
           <Tooltip />
           <Legend />
-          <Bar dataKey="count" fill="#8884d8" name="Videos" />
+          <Bar dataKey="count" fill="#8884d8" name={title} />
         </BarChart>
       )}
+      <ReactJson src={{ title, data }} theme="monokai" collapsed />
+    </div>
+  );
+}
+
+export default function Charts() {
+  const { council } = useSelectedCouncil();
+  const [videoData, setVideoData] = useState<DailyData[]>([]);
+  const [channelData, setChannelData] = useState<DailyData[]>([]);
+  const [membershipData, setMembershipData] = useState<DailyData[]>([]);
+  useEffect(() => {
+    (async () => {
+      if (!council) return;
+
+      const videoData = await getVideoChartData(
+        new Date(council.electedAt.timestamp),
+        council.endedAt ? new Date(council.endedAt.timestamp) : new Date()
+      );
+      setVideoData(videoData);
+
+      const channelData = await getChannelChartData(
+        new Date(council.electedAt.timestamp),
+        council.endedAt ? new Date(council.endedAt.timestamp) : new Date()
+      );
+      setChannelData(channelData);
+
+      const membershipData = await getMembershipChartData(
+        new Date(council.electedAt.timestamp),
+        council.endedAt ? new Date(council.endedAt.timestamp) : new Date()
+      );
+      setMembershipData(membershipData);
+    })();
+  }, [council]);
+
+  return (
+    <div>
+      <JoyChart data={videoData} title="Videos" />
+      <JoyChart data={channelData} title="Channels" />
+      <JoyChart data={membershipData} title="Membership" />
     </div>
   );
 }

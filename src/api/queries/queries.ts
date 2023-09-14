@@ -131,6 +131,7 @@ export const getVideoChartData = async (start: Date, end: Date) => {
   return data;
 };
 
+// TODO: Check non-empty channel count logic
 export const getChannelStatus = async (start: Date, end: Date) => {
   const { GetChannelsCount } = getSdk(client);
 
@@ -153,6 +154,41 @@ export const getChannelStatus = async (start: Date, end: Date) => {
     growthCount,
     growthPercent,
   };
+};
+
+export const getChannelChartData = async (start: Date, end: Date) => {
+  const { GetChannelsCount } = getSdk(client);
+
+  const startDate = new Date(start.toDateString());
+  const endDate = new Date(end.toDateString());
+
+  // iterate over days
+  const data = [];
+
+  const {
+    channelsConnection: { totalCount },
+  } = await GetChannelsCount({
+    where: { createdAt_lte: new Date(startDate.getTime() - 24 * 3600 * 1000) },
+  });
+  let prevCount = totalCount;
+  for (
+    let date = startDate;
+    date <= endDate;
+    date = new Date(date.setDate(date.getDate() + 1))
+  ) {
+    const {
+      channelsConnection: { totalCount },
+    } = await GetChannelsCount({
+      where: { createdAt_lte: date.toISOString() },
+    });
+    data.push({
+      date: date,
+      count: totalCount - prevCount,
+    });
+    prevCount = totalCount;
+  }
+
+  return data;
 };
 
 // TODO
@@ -226,6 +262,41 @@ export const getMembershipStatus = async (start: Date, end: Date) => {
     growthCount,
     growthPercent,
   };
+};
+
+export const getMembershipChartData = async (start: Date, end: Date) => {
+  const { GetMembersCount } = getSdk(client);
+
+  const startDate = new Date(start.toDateString());
+  const endDate = new Date(end.toDateString());
+
+  // iterate over days
+  const data = [];
+
+  const {
+    membershipsConnection: { totalCount },
+  } = await GetMembersCount({
+    where: { createdAt_lte: new Date(startDate.getTime() - 24 * 3600 * 1000) },
+  });
+  let prevCount = totalCount;
+  for (
+    let date = startDate;
+    date <= endDate;
+    date = new Date(date.setDate(date.getDate() + 1))
+  ) {
+    const {
+      membershipsConnection: { totalCount },
+    } = await GetMembersCount({
+      where: { createdAt_lte: date.toISOString() },
+    });
+    data.push({
+      date: date,
+      count: totalCount - prevCount,
+    });
+    prevCount = totalCount;
+  }
+
+  return data;
 };
 
 export const getProposals = async (
