@@ -10,6 +10,7 @@ import {
   Proposal,
   WorkingGroup,
 } from "@/types";
+import { toJoy } from "@/helpers";
 
 import { getSdk } from "./__generated__/gql";
 
@@ -50,7 +51,9 @@ export const getWorkingGroupBudget = async (council: ElectedCouncil) => {
   const { GetBudgetSpending } = getSdk(client);
 
   // calculate working group budgets
-  const workingGroupBudgets = {};
+  const workingGroupBudget = {} as {
+    [key in WorkingGroup["id"]]: BN;
+  };
   for await (const workingGroup of workingGroups) {
     const budgets = await GetBudgetSpending({
       where: {
@@ -64,10 +67,10 @@ export const getWorkingGroupBudget = async (council: ElectedCouncil) => {
       BN_ZERO
     );
     // @ts-ignore
-    workingGroupBudgets[workingGroup.id] = budget;
+    workingGroupBudget[workingGroup.id] = toJoy(budget);
   }
 
-  return workingGroupBudgets;
+  return workingGroupBudget;
 };
 
 //

@@ -1,5 +1,6 @@
-import { BN_TEN, BN_TWO, BN_ZERO } from '@polkadot/util';
-import BN from 'bn.js';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { BN_TEN, BN_TWO, BN_ZERO } from "@polkadot/util";
+import BN from "bn.js";
 
 type BNParam = number | string | number[] | Uint8Array | Buffer | BN;
 
@@ -8,8 +9,13 @@ export const sumStakes = (entities: { stake: BNParam }[]) =>
 
 export const asBN = (value: any) => new BN(String(value));
 
-export const sumBN = (a: BN | undefined, b: BN | undefined): BN => new BN(a ?? 0).add(new BN(b ?? 0));
+export const sumBN = (a: BN | undefined, b: BN | undefined): BN =>
+  new BN(a ?? 0).add(new BN(b ?? 0));
 
 export const powerOf10 = (value: any) => BN_TEN.pow(asBN(value));
 
 export const powerOf2 = (value: any) => BN_TWO.pow(asBN(value));
+
+export const toJoy = (value: BN): number => {
+  return value.div(powerOf10(10)).toNumber();
+};

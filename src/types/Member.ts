@@ -81,6 +81,7 @@ export const asMember = (
   isVerified: data.isVerified,
   rootAccount: data.rootAccount,
   controllerAccount: data.controllerAccount,
+  // eslint-disable-next-line no-unsafe-optional-chaining
   boundAccounts: [...data?.boundAccounts],
   boundAccountsEvents:
     data.stakingaccountaddedeventmember?.map(asBoundAccountsEvent) ?? [],
