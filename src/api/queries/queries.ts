@@ -98,6 +98,45 @@ export const getCouncilVideoStatus = async (council: ElectedCouncil) => {
   };
 };
 
+export const getCouncilVideoChartData = async (council: ElectedCouncil) => {
+  const { GetVideoCount } = getSdk(client);
+
+  const startDate = new Date(
+    new Date(council.electedAt.timestamp).toDateString()
+  );
+  const endDate = new Date(
+    new Date(council.endedAt?.timestamp || Date.now()).toDateString()
+  );
+
+  // iterate over days
+  const data = [];
+
+  const {
+    videosConnection: { totalCount },
+  } = await GetVideoCount({
+    where: { createdAt_lte: new Date(startDate.getTime() - 24 * 3600 * 1000) },
+  });
+  let prevCount = totalCount;
+  for (
+    let date = startDate;
+    date <= endDate;
+    date = new Date(date.setDate(date.getDate() + 1))
+  ) {
+    const {
+      videosConnection: { totalCount },
+    } = await GetVideoCount({
+      where: { createdAt_lte: date.toISOString() },
+    });
+    data.push({
+      date: date,
+      count: totalCount - prevCount,
+    });
+    prevCount = totalCount;
+  }
+
+  return data;
+};
+
 export const getCouncilChannelStatus = async (council: ElectedCouncil) => {
   const { GetChannelsCount } = getSdk(client);
 

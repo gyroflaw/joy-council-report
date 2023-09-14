@@ -7,6 +7,7 @@ import { CouncilSelect } from "@/components";
 import { useRpc } from "@/hooks";
 import { generateReport } from "@/helpers";
 import { useSelectedCouncil } from "@/store";
+import Charts from "./Charts";
 
 const content = `A paragraph with *emphasis* and **strong importance**.`;
 
@@ -42,6 +43,7 @@ export default function Home() {
 
       <ReactMarkdown children={content} remarkPlugins={[remarkGfm]} />
       <ReactJson src={report} theme="monokai" />
+      <Charts />
     </div>
   );
 }
