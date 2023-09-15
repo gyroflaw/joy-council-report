@@ -123,7 +123,12 @@ query GetWorkingGroups(
   $offset: Int
   $limit: Int
 ) {
-  workingGroups(where: $where, orderBy: $orderBy, offset: $offset, limit: $limit) {
+  workingGroups(
+    where: $where
+    orderBy: $orderBy
+    offset: $offset
+    limit: $limit
+  ) {
     ...WorkingGroupFields
   }
 }
@@ -140,7 +145,12 @@ query GetWorkers($where: WorkerWhereInput, $offset: Int, $limit: Int) {
   }
 }
 
-query GetPastWorkers($where: WorkerWhereInput, $offset: Int, $limit: Int, $orderBy: [WorkerOrderByInput!]) {
+query GetPastWorkers(
+  $where: WorkerWhereInput
+  $offset: Int
+  $limit: Int
+  $orderBy: [WorkerOrderByInput!]
+) {
   workers(where: $where, offset: $offset, limit: $limit, orderBy: $orderBy) {
     ...PastWorkerFields
   }
@@ -245,7 +255,9 @@ query CountWorkingGroupOpenings($where: WorkingGroupOpeningWhereInput) {
 }
 
 query CountWorkingGroupWorkers($groupId_eq: ID, $status_json: JSONObject) {
-  workersConnection(where: { group: { id_eq: $groupId_eq }, status_json: $status_json }) {
+  workersConnection(
+    where: { group: { id_eq: $groupId_eq }, status_json: $status_json }
+  ) {
     totalCount
   }
 }
@@ -256,13 +268,21 @@ query GetWorkingGroupOpenings(
   $limit: Int
   $offset: Int
 ) {
-  workingGroupOpenings(where: $where, limit: $limit, offset: $offset, orderBy: $order) {
+  workingGroupOpenings(
+    where: $where
+    limit: $limit
+    offset: $offset
+    orderBy: $order
+  ) {
     ...WorkingGroupOpeningFields
   }
 }
 
 query SimpleSearchWorkingGroupOpenings($text: String!, $limit: Int) {
-  workingGroupOpenings(where: { metadata: { shortDescription_contains: $text } }, limit: $limit) {
+  workingGroupOpenings(
+    where: { metadata: { shortDescription_contains: $text } }
+    limit: $limit
+  ) {
     id
     metadata {
       shortDescription
@@ -400,7 +420,10 @@ query GetWorkingGroupApplications(
 }
 
 query SimpleSearchWorkingGroupApplications($text: String!, $limit: Int) {
-  workingGroupApplications(where: { applicant: { handle_contains: $text } }, limit: $limit) {
+  workingGroupApplications(
+    where: { applicant: { handle_contains: $text } }
+    limit: $limit
+  ) {
     id
     applicant {
       id
@@ -415,7 +438,9 @@ query GetWorkingGroupApplicationIds($where: WorkingGroupApplicationWhereInput) {
   }
 }
 
-query GetWorkingGroupApplication($where: WorkingGroupApplicationWhereUniqueInput!) {
+query GetWorkingGroupApplication(
+  $where: WorkingGroupApplicationWhereUniqueInput!
+) {
   workingGroupApplicationByUniqueInput(where: $where) {
     ...WorkingGroupApplicationFields
   }
@@ -429,7 +454,9 @@ fragment ApplicationFormQuestionAnswerFields on ApplicationFormQuestionAnswer {
 }
 
 query GetApplicationFormQuestionAnswer($applicationId_eq: ID) {
-  applicationFormQuestionAnswers(where: { application: { id_eq: $applicationId_eq } }) {
+  applicationFormQuestionAnswers(
+    where: { application: { id_eq: $applicationId_eq } }
+  ) {
     ...ApplicationFormQuestionAnswerFields
   }
 }
@@ -455,13 +482,19 @@ fragment UpcomingWorkingGroupOpeningFields on UpcomingWorkingGroupOpening {
   }
 }
 
-query GetUpcomingWorkingGroupOpening($where: UpcomingWorkingGroupOpeningWhereUniqueInput!) {
+query GetUpcomingWorkingGroupOpening(
+  $where: UpcomingWorkingGroupOpeningWhereUniqueInput!
+) {
   upcomingWorkingGroupOpeningByUniqueInput(where: $where) {
     ...UpcomingWorkingGroupOpeningFields
   }
 }
 
-query GetUpcomingWorkingGroupOpenings($where: UpcomingWorkingGroupOpeningWhereInput, $limit: Int, $offset: Int) {
+query GetUpcomingWorkingGroupOpenings(
+  $where: UpcomingWorkingGroupOpeningWhereInput
+  $limit: Int
+  $offset: Int
+) {
   upcomingWorkingGroupOpenings(where: $where, limit: $limit, offset: $offset) {
     ...UpcomingWorkingGroupOpeningFields
   }
@@ -488,5 +521,25 @@ query GetWorkerUnstakingDetails($where: WorkerWhereUniqueInput!) {
         unstakingPeriod
       }
     }
+  }
+}
+
+query GetTerminatedWorkerEventsConnection(
+  $where: TerminatedWorkerEventWhereInput
+  $orderBy: [TerminatedWorkerEventOrderByInput!]
+  $first: Int
+  $last: Int
+  $after: String
+  $before: String
+) {
+  terminatedWorkerEventsConnection(
+    first: $first
+    after: $after
+    last: $last
+    before: $before
+    where: $where
+    orderBy: $order
+  ) {
+    totalCount
   }
 }

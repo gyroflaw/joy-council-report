@@ -37336,6 +37336,16 @@ export type GetElectionsQuery = { __typename: 'Query', electionRounds: Array<{ _
 
 export type ElectionRoundFieldsFragment = { __typename: 'ElectionRound', id: string, cycleId: number, endedAtBlock?: number | null, endedAtTime?: any | null, endedAtNetwork?: Network | null, candidates: Array<{ __typename: 'Candidate', stake: string }>, castVotes: Array<{ __typename: 'CastVote', voteForId?: string | null }> };
 
+export type GetFundingProposalPaidQueryVariables = Exact<{
+  where?: InputMaybe<RequestFundedEventWhereInput>;
+  orderBy?: InputMaybe<Array<RequestFundedEventOrderByInput> | RequestFundedEventOrderByInput>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetFundingProposalPaidQuery = { __typename: 'Query', requestFundedEvents: Array<{ __typename: 'RequestFundedEvent', amount: string }> };
+
 export type GetMembersCountQueryVariables = Exact<{
   where?: InputMaybe<MembershipWhereInput>;
 }>;
@@ -38244,6 +38254,18 @@ export const GetElectionsDocument = gql`
   }
 }
     ${ElectionRoundFieldsFragmentDoc}`;
+export const GetFundingProposalPaidDocument = gql`
+    query getFundingProposalPaid($where: RequestFundedEventWhereInput, $orderBy: [RequestFundedEventOrderByInput!], $offset: Int, $limit: Int) {
+  requestFundedEvents(
+    where: $where
+    orderBy: $orderBy
+    offset: $offset
+    limit: $limit
+  ) {
+    amount
+  }
+}
+    `;
 export const GetMembersCountDocument = gql`
     query GetMembersCount($where: MembershipWhereInput) {
   membershipsConnection(where: $where) {
@@ -38656,6 +38678,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     GetElections(variables?: GetElectionsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetElectionsQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetElectionsQuery>(GetElectionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'GetElections', 'query');
+    },
+    getFundingProposalPaid(variables?: GetFundingProposalPaidQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetFundingProposalPaidQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetFundingProposalPaidQuery>(GetFundingProposalPaidDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getFundingProposalPaid', 'query');
     },
     GetMembersCount(variables?: GetMembersCountQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetMembersCountQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetMembersCountQuery>(GetMembersCountDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'GetMembersCount', 'query');

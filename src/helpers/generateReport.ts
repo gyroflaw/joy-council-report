@@ -10,10 +10,14 @@ import {
   getVideoNftStatus,
   getVideoStatus,
   getTotalSupply,
-  getWorkingGroupBudget,
+  getWorkingGroupBudgetSpending,
+  getForumStatus,
+  getWorkingGroupStatus,
+  getFundingProposalPaid,
 } from "@/api";
 import { MEXC_WALLET } from "@/config";
 import { toJoy } from "./bn";
+import { BN } from "bn.js";
 
 export async function generateReport(
   api: ApiPromise,
@@ -67,7 +71,32 @@ export async function generateReport(
   // TODO
 
   // 5. https://github.com/0x2bc/council/blob/main/Automation_Council_and_Weekly_Reports.md#dao-spending
-  // TODO
+  // TODO: Check council rewards
+  const councilMembers = await api.query.council.councilMembers();
+  const councilorReward = await api.query.council.councilorReward();
+  const councilRewards = toJoy(
+    councilorReward.mul(
+      new BN(councilMembers.length * (endBlockNumber - startBlockNumber))
+    )
+  );
+  const workingGroupBudgetSpending = await getWorkingGroupBudgetSpending(
+    startBlockTimestamp,
+    endBlockTimestamp
+  );
+  const fundingProposals = toJoy(
+    await getFundingProposalPaid(startBlockTimestamp, endBlockTimestamp)
+  );
+  const creatorPayoutRewards = toJoy(new BN(0));
+
+  // calc validator rewards
+  // iterate all blocks and get validator reward per block and sum them up
+
+  const daoSpending = {
+    councilRewards,
+    workingGroup: workingGroupBudgetSpending,
+    fundingProposals,
+    creatorPayoutRewards,
+  };
 
   // 6. https://github.com/0x2bc/council/blob/main/Automation_Council_and_Weekly_Reports.md#council-budget
   const councilBudget = await getCouncilBudget(
@@ -77,10 +106,7 @@ export async function generateReport(
   );
 
   // 7. https://github.com/0x2bc/council/blob/main/Automation_Council_and_Weekly_Reports.md#wg-budgets
-  const workingGroupBudget = await getWorkingGroupBudget(
-    startBlockTimestamp,
-    endBlockTimestamp
-  );
+  // TODO
 
   // 8. https://github.com/0x2bc/council/blob/main/Automation_Council_and_Weekly_Reports.md#videos
   const videoStatus = await getVideoStatus(
@@ -134,12 +160,63 @@ export async function generateReport(
       endBalance,
       mexcBalChange,
     },
+    daoSpending,
     councilBudget,
-    workingGroupBudget,
+    workingGroupBudgetSpending,
     videoStatus,
     channelStatus,
     videoNftStatus,
     membershipStatus,
     proposals,
+  };
+}
+
+export async function generateReport4(
+  api: ApiPromise,
+  startBlockNumber: number,
+  endBlockNumber: number
+) {
+  const startBlockHash = await getBlockHash(api, startBlockNumber);
+  const startBlockTimestamp = new Date(
+    (await (await api.at(startBlockHash)).query.timestamp.now()).toNumber()
+  );
+  const endBlockHash = await getBlockHash(api, endBlockNumber);
+  const endBlockTimestamp = new Date(
+    (await (await api.at(endBlockHash)).query.timestamp.now()).toNumber()
+  );
+
+  const channel = await getChannelStatus(
+    startBlockTimestamp,
+    endBlockTimestamp
+  );
+
+  const video = await getVideoStatus(startBlockTimestamp, endBlockTimestamp);
+
+  const forum = await getForumStatus(startBlockTimestamp, endBlockTimestamp);
+
+  const proposals = await getProposals(startBlockTimestamp, endBlockTimestamp);
+  const proposal = {
+    total: proposals.length,
+    passed: proposals.filter((p) => p.status === "executed").length,
+    rejected: proposals.filter((p) => p.status === "rejected").length,
+    expired: proposals.filter((p) => p.status === "expired").length,
+  };
+
+  const membership = await getMembershipStatus(
+    startBlockTimestamp,
+    endBlockTimestamp
+  );
+  const workingGroup = await getWorkingGroupStatus(
+    startBlockTimestamp,
+    endBlockTimestamp
+  );
+
+  return {
+    channel,
+    video,
+    forum,
+    proposal,
+    membership,
+    workingGroup,
   };
 }

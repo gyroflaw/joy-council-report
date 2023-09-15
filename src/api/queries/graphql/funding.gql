@@ -1,0 +1,15 @@
+query getFundingProposalPaid(
+  $where: RequestFundedEventWhereInput
+  $orderBy: [RequestFundedEventOrderByInput!]
+  $offset: Int
+  $limit: Int
+) {
+  requestFundedEvents(
+    where: $where
+    orderBy: $orderBy
+    offset: $offset
+    limit: $limit
+  ) {
+    amount
+  }
+}

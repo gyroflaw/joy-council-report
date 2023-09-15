@@ -14,7 +14,9 @@ import { toJoy } from "@/helpers";
 
 import { getSdk } from "./__generated__/gql";
 
-const client = new GraphQLClient(QN_URL);
+export { getSdk } from "./__generated__/gql";
+
+export const client = new GraphQLClient(QN_URL);
 
 export const getElectedCouncils = async (): Promise<ElectedCouncil[]> => {
   const { GetElectedCouncils } = getSdk(client);
@@ -44,7 +46,7 @@ export const getWorkingGroups = async (): Promise<WorkingGroup[]> => {
   return workingGroups.workingGroups.map(asWorkingGroup);
 };
 
-export const getWorkingGroupBudget = async (start: Date, end: Date) => {
+export const getWorkingGroupBudgetSpending = async (start: Date, end: Date) => {
   const workingGroups = await getWorkingGroups();
   const { GetBudgetSpending } = getSdk(client);
 
@@ -69,6 +71,19 @@ export const getWorkingGroupBudget = async (start: Date, end: Date) => {
   }
 
   return workingGroupBudget;
+};
+
+export const getFundingProposalPaid = async (start: Date, end: Date) => {
+  const { getFundingProposalPaid } = getSdk(client);
+  const { requestFundedEvents } = await getFundingProposalPaid({
+    where: { createdAt_gte: start, createdAt_lte: end },
+  });
+
+  const paid = requestFundedEvents
+    .map((e) => new BN(e.amount))
+    .reduce((a, b) => a.add(b), BN_ZERO);
+
+  return paid;
 };
 
 //
@@ -312,4 +327,97 @@ export const getProposals = async (
   });
 
   return proposals.map(asProposal);
+};
+
+export const getForumThreadStatus = async (start: Date, end: Date) => {
+  const { GetForumThreadsCount } = getSdk(client);
+
+  const {
+    forumThreadsConnection: { totalCount: startCount },
+  } = await GetForumThreadsCount({
+    where: { createdAt_lte: start },
+  });
+  const {
+    forumThreadsConnection: { totalCount: endCount },
+  } = await GetForumThreadsCount({
+    where: { createdAt_lte: end },
+  });
+  const growthCount = endCount - startCount;
+  const growthPercent = (growthCount / startCount) * 100;
+
+  return {
+    startCount,
+    endCount,
+    growthCount,
+    growthPercent,
+  };
+};
+
+export const getForumPostStatus = async (start: Date, end: Date) => {
+  const { GetForumPostsCount } = getSdk(client);
+
+  const {
+    forumPostsConnection: { totalCount: startCount },
+  } = await GetForumPostsCount({
+    where: { createdAt_lte: start },
+  });
+  const {
+    forumPostsConnection: { totalCount: endCount },
+  } = await GetForumPostsCount({
+    where: { createdAt_lte: end },
+  });
+  const growthCount = endCount - startCount;
+  const growthPercent = (growthCount / startCount) * 100;
+
+  return {
+    startCount,
+    endCount,
+    growthCount,
+    growthPercent,
+  };
+};
+
+export const getForumStatus = async (start: Date, end: Date) => {
+  const [thread, post] = await Promise.all([
+    getForumThreadStatus(start, end),
+    getForumPostStatus(start, end),
+  ]);
+
+  return { thread, post };
+};
+
+export const getWorkingGroupStatus = async (start: Date, end: Date) => {
+  const { GetWorkingGroupOpenings, GetWorkingGroupApplications } =
+    getSdk(client);
+
+  const { workingGroupOpenings: startOpenings } = await GetWorkingGroupOpenings(
+    {
+      where: { createdAt_lte: start },
+    }
+  );
+  const { workingGroupOpenings: endOpenings } = await GetWorkingGroupOpenings({
+    where: { createdAt_lte: end },
+  });
+
+  const { workingGroupApplications: startApplications } =
+    await GetWorkingGroupApplications({
+      where: { createdAt_lte: start },
+    });
+  const { workingGroupApplications: endApplications } =
+    await GetWorkingGroupApplications({
+      where: { createdAt_lte: end },
+    });
+
+  // TODO: Total Filled positions
+
+  return {
+    openings: {
+      startCount: startOpenings.length,
+      endCount: endOpenings.length,
+    },
+    applications: {
+      startCount: startApplications.length,
+      endCount: endApplications.length,
+    },
+  };
 };

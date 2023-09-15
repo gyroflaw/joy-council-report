@@ -3,7 +3,7 @@ import ReactJson from "react-json-view";
 
 import { CouncilSelect } from "@/components";
 import { useRpc } from "@/hooks";
-import { generateReport } from "@/helpers";
+import { generateReport, generateReport4 } from "@/helpers";
 import { useSelectedCouncil } from "@/store";
 import Charts from "./Charts";
 
@@ -11,6 +11,7 @@ export default function Home() {
   const { council, setCouncil } = useSelectedCouncil();
   const { api, connectionState } = useRpc();
   const [report, setReport] = useState({});
+  const [report4, setReport4] = useState({});
   const [loading, setLoading] = useState(false);
   const [startBlock, setStartBlock] = useState(0);
   const [endBlock, setEndBlock] = useState(0);
@@ -28,8 +29,12 @@ export default function Home() {
     if (!api) return;
     setLoading(true);
 
-    const report = await generateReport(api, startBlock, endBlock);
+    const [report, report4] = await Promise.all([
+      generateReport(api, startBlock, endBlock),
+      generateReport4(api, startBlock, endBlock),
+    ]);
     setReport(report);
+    setReport4(report4);
     setLoading(false);
   }, [api, startBlock, endBlock]);
 
@@ -62,7 +67,10 @@ export default function Home() {
         {loading ? "Generating..." : "Generate report"}
       </button>
 
-      <ReactJson src={report} theme="monokai" />
+      <h4>option 2</h4>
+      <ReactJson src={report} theme="monokai" collapsed />
+      <h4>option 4</h4>
+      <ReactJson src={report4} theme="monokai" collapsed />
       <Charts />
     </div>
   );
