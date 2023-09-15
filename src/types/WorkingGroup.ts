@@ -3,8 +3,9 @@ import BN from "bn.js";
 import { sumStakes } from "@/helpers";
 import {
   WorkerFieldsFragment,
-  WorkingGroupFieldsFragment,
+  WorkingGroupDetailedFieldsFragment,
 } from "@/api/queries";
+import { asWorkerWithDetails, WorkerWithDetails } from "./Worker";
 
 export const GroupIdToGroupParam = {
   contentWorkingGroup: "Content",
@@ -25,7 +26,8 @@ export interface WorkingGroup {
   name: string;
   image?: string;
   about?: string;
-  leadId?: string;
+  leader?: WorkerWithDetails;
+  workers: WorkerWithDetails[];
   status?: string;
   description?: string;
   statusMessage?: string;
@@ -35,7 +37,7 @@ export interface WorkingGroup {
 }
 
 export const asWorkingGroup = (
-  group: WorkingGroupFieldsFragment
+  group: WorkingGroupDetailedFieldsFragment
 ): WorkingGroup => {
   return {
     id: group.id as GroupIdName,
@@ -47,7 +49,8 @@ export const asWorkingGroup = (
     statusMessage: group.metadata?.statusMessage ?? "",
     budget: new BN(group.budget),
     averageStake: getAverageStake(group.workers),
-    leadId: group.leader?.membershipId,
+    leader: group.leader ? asWorkerWithDetails(group.leader) : undefined,
+    workers: group.workers.map(asWorkerWithDetails),
     isActive: group.leader?.isActive ?? false,
   };
 };

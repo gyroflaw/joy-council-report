@@ -10,9 +10,9 @@ import {
   Proposal,
   WorkingGroup,
 } from "@/types";
-import { toJoy } from "@/helpers";
 
 import { getSdk } from "./__generated__/gql";
+import { toJoy } from "@/helpers";
 
 export { getSdk } from "./__generated__/gql";
 
@@ -46,13 +46,13 @@ export const getWorkingGroups = async (): Promise<WorkingGroup[]> => {
   return workingGroups.workingGroups.map(asWorkingGroup);
 };
 
-export const getWorkingGroupBudgetSpending = async (start: Date, end: Date) => {
+export const getWorkingGroupBudget = async (start: Date, end: Date) => {
   const workingGroups = await getWorkingGroups();
-  const { GetBudgetSpending } = getSdk(client);
+  const { GetBudgetSpending, getFundingProposalPaid } = getSdk(client);
 
   // calculate working group budgets
-  const workingGroupBudget = {} as {
-    [key in WorkingGroup["id"]]: BN;
+  const spending = {} as {
+    [key in WorkingGroup["id"]]: number;
   };
   for await (const workingGroup of workingGroups) {
     const budgets = await GetBudgetSpending({
@@ -66,11 +66,73 @@ export const getWorkingGroupBudgetSpending = async (start: Date, end: Date) => {
       (total, { amount }) => total.add(new BN(amount)),
       BN_ZERO
     );
-    // @ts-ignore
-    workingGroupBudget[workingGroup.id] = toJoy(budget);
+
+    spending[workingGroup.id] = toJoy(budget);
   }
 
-  return workingGroupBudget;
+  const budget = {} as {
+    [key in WorkingGroup["id"]]: number;
+  };
+  for (const workingGroup of workingGroups) {
+    budget[workingGroup.id] = toJoy(workingGroup.budget ?? BN_ZERO);
+  }
+
+  const leadSalary = {} as {
+    [key in WorkingGroup["id"]]: number | undefined;
+  };
+  for (const workingGroup of workingGroups) {
+    leadSalary[workingGroup.id] = workingGroup.leader
+      ? toJoy(workingGroup.leader.rewardPerBlock)
+      : undefined;
+  }
+
+  const workersSalary = {} as {
+    [key in WorkingGroup["id"]]: number;
+  };
+  for await (const workingGroup of workingGroups) {
+    const salariesPromise = workingGroup.workers.map(async (worker) => {
+      let salary = BN_ZERO;
+      salary = salary.add(worker.rewardPerBlock);
+
+      const proposalPaidPromise = getFundingProposalPaid({
+        where: {
+          account_eq: worker.rewardAccount,
+          createdAt_gte: start,
+          createdAt_lte: end,
+        },
+      });
+      const directPaysPromise = GetBudgetSpending({
+        where: {
+          reciever_eq: worker.rewardAccount,
+          createdAt_gte: start,
+          createdAt_lte: end,
+        },
+      });
+      const [proposalPaid, directPays] = await Promise.all([
+        proposalPaidPromise,
+        directPaysPromise,
+      ]);
+
+      const paid = proposalPaid.requestFundedEvents
+        .map((e) => new BN(e.amount))
+        .reduce((a, b) => a.add(b), BN_ZERO);
+      salary = salary.add(paid);
+
+      const discretionarySpending = directPays.budgetSpendingEvents.reduce(
+        (total, { amount }) => total.add(new BN(amount)),
+        BN_ZERO
+      );
+
+      salary = salary.add(discretionarySpending);
+      return salary;
+    });
+
+    const salaries = await Promise.all(salariesPromise);
+    const groupSalary = salaries.reduce((a, b) => a.add(b), BN_ZERO);
+    workersSalary[workingGroup.id] = toJoy(groupSalary);
+  }
+
+  return { budget, spending, leadSalary, workersSalary };
 };
 
 export const getFundingProposalPaid = async (start: Date, end: Date) => {

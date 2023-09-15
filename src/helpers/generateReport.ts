@@ -10,7 +10,7 @@ import {
   getVideoNftStatus,
   getVideoStatus,
   getTotalSupply,
-  getWorkingGroupBudgetSpending,
+  getWorkingGroupBudget,
   getForumStatus,
   getWorkingGroupStatus,
   getFundingProposalPaid,
@@ -79,7 +79,7 @@ export async function generateReport(
       new BN(councilMembers.length * (endBlockNumber - startBlockNumber))
     )
   );
-  const workingGroupBudgetSpending = await getWorkingGroupBudgetSpending(
+  const workingGroupBudget = await getWorkingGroupBudget(
     startBlockTimestamp,
     endBlockTimestamp
   );
@@ -93,7 +93,6 @@ export async function generateReport(
 
   const daoSpending = {
     councilRewards,
-    workingGroup: workingGroupBudgetSpending,
     fundingProposals,
     creatorPayoutRewards,
   };
@@ -162,7 +161,7 @@ export async function generateReport(
     },
     daoSpending,
     councilBudget,
-    workingGroupBudgetSpending,
+    workingGroupBudget,
     videoStatus,
     channelStatus,
     videoNftStatus,

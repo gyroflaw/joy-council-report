@@ -93,12 +93,11 @@ fragment WorkingGroupFields on WorkingGroup {
 
 fragment WorkingGroupDetailedFields on WorkingGroup {
   ...WorkingGroupFields
+  workers {
+    ...WorkerDetailedFields
+  }
   leader {
-    id
-    runtimeId
-    stake
-    membershipId
-    rewardPerBlock
+    ...WorkerDetailedFields
   }
 }
 
@@ -129,7 +128,7 @@ query GetWorkingGroups(
     offset: $offset
     limit: $limit
   ) {
-    ...WorkingGroupFields
+    ...WorkingGroupDetailedFields
   }
 }
 
@@ -538,7 +537,7 @@ query GetTerminatedWorkerEventsConnection(
     last: $last
     before: $before
     where: $where
-    orderBy: $order
+    orderBy: $orderBy
   ) {
     totalCount
   }

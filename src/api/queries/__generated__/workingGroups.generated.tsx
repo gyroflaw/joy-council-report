@@ -14,7 +14,7 @@ export type WorkerDetailedFieldsFragment = { __typename: 'Worker', roleAccount: 
 
 export type WorkingGroupFieldsFragment = { __typename: 'WorkingGroup', id: string, name: string, budget: string, metadata?: { __typename: 'WorkingGroupMetadata', about?: string | null, description?: string | null, status?: string | null, statusMessage?: string | null } | null, workers: Array<{ __typename: 'Worker', stake: string }>, leader?: { __typename: 'Worker', membershipId: string, isActive: boolean } | null };
 
-export type WorkingGroupDetailedFieldsFragment = { __typename: 'WorkingGroup', id: string, name: string, budget: string, leader?: { __typename: 'Worker', id: string, runtimeId: number, stake: string, membershipId: string, rewardPerBlock: string, isActive: boolean } | null, metadata?: { __typename: 'WorkingGroupMetadata', about?: string | null, description?: string | null, status?: string | null, statusMessage?: string | null } | null, workers: Array<{ __typename: 'Worker', stake: string }> };
+export type WorkingGroupDetailedFieldsFragment = { __typename: 'WorkingGroup', id: string, name: string, budget: string, workers: Array<{ __typename: 'Worker', stake: string, roleAccount: string, rewardAccount: string, stakeAccount: string, id: string, runtimeId: number, applicationId: string, isLead: boolean, rewardPerBlock: string, missingRewardAmount?: string | null, entry: { __typename: 'OpeningFilledEvent', inBlock: number, network: Types.Network, createdAt: any }, application: { __typename: 'WorkingGroupApplication', id: string, openingId: string, opening: { __typename: 'WorkingGroupOpening', stakeAmount: string } }, membership: { __typename: 'Membership', id: string, rootAccount: string, controllerAccount: string, boundAccounts: Array<string>, handle: string, isVerified: boolean, isFoundingMember: boolean, isCouncilMember: boolean, inviteCount: number, createdAt: any, metadata: { __typename: 'MemberMetadata', name?: string | null, about?: string | null, avatar?: { __typename: 'AvatarObject' } | { __typename: 'AvatarUri', avatarUri: string } | null }, roles: Array<{ __typename: 'Worker', id: string, createdAt: any, isLead: boolean, group: { __typename: 'WorkingGroup', name: string } }>, stakingaccountaddedeventmember?: Array<{ __typename: 'StakingAccountAddedEvent', createdAt: any, inBlock: number, network: Types.Network, account: string }> | null }, group: { __typename: 'WorkingGroup', id: string, name: string }, status: { __typename: 'WorkerStatusActive' } | { __typename: 'WorkerStatusLeaving' } | { __typename: 'WorkerStatusLeft' } | { __typename: 'WorkerStatusTerminated' } }>, leader?: { __typename: 'Worker', membershipId: string, isActive: boolean, roleAccount: string, rewardAccount: string, stakeAccount: string, id: string, runtimeId: number, applicationId: string, isLead: boolean, rewardPerBlock: string, missingRewardAmount?: string | null, stake: string, entry: { __typename: 'OpeningFilledEvent', inBlock: number, network: Types.Network, createdAt: any }, application: { __typename: 'WorkingGroupApplication', id: string, openingId: string, opening: { __typename: 'WorkingGroupOpening', stakeAmount: string } }, membership: { __typename: 'Membership', id: string, rootAccount: string, controllerAccount: string, boundAccounts: Array<string>, handle: string, isVerified: boolean, isFoundingMember: boolean, isCouncilMember: boolean, inviteCount: number, createdAt: any, metadata: { __typename: 'MemberMetadata', name?: string | null, about?: string | null, avatar?: { __typename: 'AvatarObject' } | { __typename: 'AvatarUri', avatarUri: string } | null }, roles: Array<{ __typename: 'Worker', id: string, createdAt: any, isLead: boolean, group: { __typename: 'WorkingGroup', name: string } }>, stakingaccountaddedeventmember?: Array<{ __typename: 'StakingAccountAddedEvent', createdAt: any, inBlock: number, network: Types.Network, account: string }> | null }, group: { __typename: 'WorkingGroup', id: string, name: string }, status: { __typename: 'WorkerStatusActive' } | { __typename: 'WorkerStatusLeaving' } | { __typename: 'WorkerStatusLeft' } | { __typename: 'WorkerStatusTerminated' } } | null, metadata?: { __typename: 'WorkingGroupMetadata', about?: string | null, description?: string | null, status?: string | null, statusMessage?: string | null } | null };
 
 export type BudgetSpendingEventFieldsFragment = { __typename: 'BudgetSpendingEvent', id: string, groupId: string, reciever: string, amount: string, rationale?: string | null };
 
@@ -28,7 +28,7 @@ export type GetWorkingGroupsQueryVariables = Types.Exact<{
 }>;
 
 
-export type GetWorkingGroupsQuery = { __typename: 'Query', workingGroups: Array<{ __typename: 'WorkingGroup', id: string, name: string, budget: string, metadata?: { __typename: 'WorkingGroupMetadata', about?: string | null, description?: string | null, status?: string | null, statusMessage?: string | null } | null, workers: Array<{ __typename: 'Worker', stake: string }>, leader?: { __typename: 'Worker', membershipId: string, isActive: boolean } | null }> };
+export type GetWorkingGroupsQuery = { __typename: 'Query', workingGroups: Array<{ __typename: 'WorkingGroup', id: string, name: string, budget: string, workers: Array<{ __typename: 'Worker', stake: string, roleAccount: string, rewardAccount: string, stakeAccount: string, id: string, runtimeId: number, applicationId: string, isLead: boolean, rewardPerBlock: string, missingRewardAmount?: string | null, entry: { __typename: 'OpeningFilledEvent', inBlock: number, network: Types.Network, createdAt: any }, application: { __typename: 'WorkingGroupApplication', id: string, openingId: string, opening: { __typename: 'WorkingGroupOpening', stakeAmount: string } }, membership: { __typename: 'Membership', id: string, rootAccount: string, controllerAccount: string, boundAccounts: Array<string>, handle: string, isVerified: boolean, isFoundingMember: boolean, isCouncilMember: boolean, inviteCount: number, createdAt: any, metadata: { __typename: 'MemberMetadata', name?: string | null, about?: string | null, avatar?: { __typename: 'AvatarObject' } | { __typename: 'AvatarUri', avatarUri: string } | null }, roles: Array<{ __typename: 'Worker', id: string, createdAt: any, isLead: boolean, group: { __typename: 'WorkingGroup', name: string } }>, stakingaccountaddedeventmember?: Array<{ __typename: 'StakingAccountAddedEvent', createdAt: any, inBlock: number, network: Types.Network, account: string }> | null }, group: { __typename: 'WorkingGroup', id: string, name: string }, status: { __typename: 'WorkerStatusActive' } | { __typename: 'WorkerStatusLeaving' } | { __typename: 'WorkerStatusLeft' } | { __typename: 'WorkerStatusTerminated' } }>, leader?: { __typename: 'Worker', membershipId: string, isActive: boolean, roleAccount: string, rewardAccount: string, stakeAccount: string, id: string, runtimeId: number, applicationId: string, isLead: boolean, rewardPerBlock: string, missingRewardAmount?: string | null, stake: string, entry: { __typename: 'OpeningFilledEvent', inBlock: number, network: Types.Network, createdAt: any }, application: { __typename: 'WorkingGroupApplication', id: string, openingId: string, opening: { __typename: 'WorkingGroupOpening', stakeAmount: string } }, membership: { __typename: 'Membership', id: string, rootAccount: string, controllerAccount: string, boundAccounts: Array<string>, handle: string, isVerified: boolean, isFoundingMember: boolean, isCouncilMember: boolean, inviteCount: number, createdAt: any, metadata: { __typename: 'MemberMetadata', name?: string | null, about?: string | null, avatar?: { __typename: 'AvatarObject' } | { __typename: 'AvatarUri', avatarUri: string } | null }, roles: Array<{ __typename: 'Worker', id: string, createdAt: any, isLead: boolean, group: { __typename: 'WorkingGroup', name: string } }>, stakingaccountaddedeventmember?: Array<{ __typename: 'StakingAccountAddedEvent', createdAt: any, inBlock: number, network: Types.Network, account: string }> | null }, group: { __typename: 'WorkingGroup', id: string, name: string }, status: { __typename: 'WorkerStatusActive' } | { __typename: 'WorkerStatusLeaving' } | { __typename: 'WorkerStatusLeft' } | { __typename: 'WorkerStatusTerminated' } } | null, metadata?: { __typename: 'WorkingGroupMetadata', about?: string | null, description?: string | null, status?: string | null, statusMessage?: string | null } | null }> };
 
 export type GetBudgetSpendingQueryVariables = Types.Exact<{
   where?: Types.InputMaybe<Types.BudgetSpendingEventWhereInput>;
@@ -169,7 +169,7 @@ export type GetWorkingGroupQueryVariables = Types.Exact<{
 }>;
 
 
-export type GetWorkingGroupQuery = { __typename: 'Query', workingGroupByUniqueInput?: { __typename: 'WorkingGroup', id: string, name: string, budget: string, leader?: { __typename: 'Worker', id: string, runtimeId: number, stake: string, membershipId: string, rewardPerBlock: string, isActive: boolean } | null, metadata?: { __typename: 'WorkingGroupMetadata', about?: string | null, description?: string | null, status?: string | null, statusMessage?: string | null } | null, workers: Array<{ __typename: 'Worker', stake: string }> } | null };
+export type GetWorkingGroupQuery = { __typename: 'Query', workingGroupByUniqueInput?: { __typename: 'WorkingGroup', id: string, name: string, budget: string, workers: Array<{ __typename: 'Worker', stake: string, roleAccount: string, rewardAccount: string, stakeAccount: string, id: string, runtimeId: number, applicationId: string, isLead: boolean, rewardPerBlock: string, missingRewardAmount?: string | null, entry: { __typename: 'OpeningFilledEvent', inBlock: number, network: Types.Network, createdAt: any }, application: { __typename: 'WorkingGroupApplication', id: string, openingId: string, opening: { __typename: 'WorkingGroupOpening', stakeAmount: string } }, membership: { __typename: 'Membership', id: string, rootAccount: string, controllerAccount: string, boundAccounts: Array<string>, handle: string, isVerified: boolean, isFoundingMember: boolean, isCouncilMember: boolean, inviteCount: number, createdAt: any, metadata: { __typename: 'MemberMetadata', name?: string | null, about?: string | null, avatar?: { __typename: 'AvatarObject' } | { __typename: 'AvatarUri', avatarUri: string } | null }, roles: Array<{ __typename: 'Worker', id: string, createdAt: any, isLead: boolean, group: { __typename: 'WorkingGroup', name: string } }>, stakingaccountaddedeventmember?: Array<{ __typename: 'StakingAccountAddedEvent', createdAt: any, inBlock: number, network: Types.Network, account: string }> | null }, group: { __typename: 'WorkingGroup', id: string, name: string }, status: { __typename: 'WorkerStatusActive' } | { __typename: 'WorkerStatusLeaving' } | { __typename: 'WorkerStatusLeft' } | { __typename: 'WorkerStatusTerminated' } }>, leader?: { __typename: 'Worker', membershipId: string, isActive: boolean, roleAccount: string, rewardAccount: string, stakeAccount: string, id: string, runtimeId: number, applicationId: string, isLead: boolean, rewardPerBlock: string, missingRewardAmount?: string | null, stake: string, entry: { __typename: 'OpeningFilledEvent', inBlock: number, network: Types.Network, createdAt: any }, application: { __typename: 'WorkingGroupApplication', id: string, openingId: string, opening: { __typename: 'WorkingGroupOpening', stakeAmount: string } }, membership: { __typename: 'Membership', id: string, rootAccount: string, controllerAccount: string, boundAccounts: Array<string>, handle: string, isVerified: boolean, isFoundingMember: boolean, isCouncilMember: boolean, inviteCount: number, createdAt: any, metadata: { __typename: 'MemberMetadata', name?: string | null, about?: string | null, avatar?: { __typename: 'AvatarObject' } | { __typename: 'AvatarUri', avatarUri: string } | null }, roles: Array<{ __typename: 'Worker', id: string, createdAt: any, isLead: boolean, group: { __typename: 'WorkingGroup', name: string } }>, stakingaccountaddedeventmember?: Array<{ __typename: 'StakingAccountAddedEvent', createdAt: any, inBlock: number, network: Types.Network, account: string }> | null }, group: { __typename: 'WorkingGroup', id: string, name: string }, status: { __typename: 'WorkerStatusActive' } | { __typename: 'WorkerStatusLeaving' } | { __typename: 'WorkerStatusLeft' } | { __typename: 'WorkerStatusTerminated' } } | null, metadata?: { __typename: 'WorkingGroupMetadata', about?: string | null, description?: string | null, status?: string | null, statusMessage?: string | null } | null } | null };
 
 export type WorkingGroupApplicationFieldsFragment = { __typename: 'WorkingGroupApplication', id: string, runtimeId: number, stakingAccount: string, stake: string, roleAccount: string, answers: Array<{ __typename: 'ApplicationFormQuestionAnswer', answer: string, question: { __typename: 'ApplicationFormQuestion', question?: string | null } }>, opening: { __typename: 'WorkingGroupOpening', id: string, type: Types.WorkingGroupOpeningType, rewardPerBlock: string, group: { __typename: 'WorkingGroup', id: string, name: string }, metadata: { __typename: 'WorkingGroupOpeningMetadata', expectedEnding?: any | null } }, applicant: { __typename: 'Membership', id: string, rootAccount: string, controllerAccount: string, boundAccounts: Array<string>, handle: string, isVerified: boolean, isFoundingMember: boolean, isCouncilMember: boolean, inviteCount: number, createdAt: any, metadata: { __typename: 'MemberMetadata', name?: string | null, about?: string | null, avatar?: { __typename: 'AvatarObject' } | { __typename: 'AvatarUri', avatarUri: string } | null }, roles: Array<{ __typename: 'Worker', id: string, createdAt: any, isLead: boolean, group: { __typename: 'WorkingGroup', name: string } }>, stakingaccountaddedeventmember?: Array<{ __typename: 'StakingAccountAddedEvent', createdAt: any, inBlock: number, network: Types.Network, account: string }> | null }, status: { __typename: 'ApplicationStatusAccepted' } | { __typename: 'ApplicationStatusCancelled' } | { __typename: 'ApplicationStatusPending' } | { __typename: 'ApplicationStatusRejected' } | { __typename: 'ApplicationStatusWithdrawn' }, createdInEvent: { __typename: 'AppliedOnOpeningEvent', createdAt: any, inBlock: number, network: Types.Network } };
 
@@ -245,6 +245,18 @@ export type GetWorkerUnstakingDetailsQueryVariables = Types.Exact<{
 
 export type GetWorkerUnstakingDetailsQuery = { __typename: 'Query', workerByUniqueInput?: { __typename: 'Worker', status: { __typename: 'WorkerStatusActive' } | { __typename: 'WorkerStatusLeaving', workerStartedLeavingEvent?: { __typename: 'WorkerStartedLeavingEvent', createdAt: any } | null } | { __typename: 'WorkerStatusLeft' } | { __typename: 'WorkerStatusTerminated' }, application: { __typename: 'WorkingGroupApplication', opening: { __typename: 'WorkingGroupOpening', unstakingPeriod: number } } } | null };
 
+export type GetTerminatedWorkerEventsConnectionQueryVariables = Types.Exact<{
+  where?: Types.InputMaybe<Types.TerminatedWorkerEventWhereInput>;
+  orderBy?: Types.InputMaybe<Array<Types.TerminatedWorkerEventOrderByInput> | Types.TerminatedWorkerEventOrderByInput>;
+  first?: Types.InputMaybe<Types.Scalars['Int']['input']>;
+  last?: Types.InputMaybe<Types.Scalars['Int']['input']>;
+  after?: Types.InputMaybe<Types.Scalars['String']['input']>;
+  before?: Types.InputMaybe<Types.Scalars['String']['input']>;
+}>;
+
+
+export type GetTerminatedWorkerEventsConnectionQuery = { __typename: 'Query', terminatedWorkerEventsConnection: { __typename: 'TerminatedWorkerEventConnection', totalCount: number } };
+
 export const PastWorkerFieldsFragmentDoc = gql`
     fragment PastWorkerFields on Worker {
   id
@@ -277,6 +289,31 @@ export const PastWorkerFieldsFragmentDoc = gql`
   }
 }
     ${MemberFieldsFragmentDoc}`;
+export const WorkingGroupMetadataFieldsFragmentDoc = gql`
+    fragment WorkingGroupMetadataFields on WorkingGroupMetadata {
+  about
+  description
+  status
+  statusMessage
+}
+    `;
+export const WorkingGroupFieldsFragmentDoc = gql`
+    fragment WorkingGroupFields on WorkingGroup {
+  id
+  name
+  budget
+  metadata {
+    ...WorkingGroupMetadataFields
+  }
+  workers {
+    stake
+  }
+  leader {
+    membershipId
+    isActive
+  }
+}
+    ${WorkingGroupMetadataFieldsFragmentDoc}`;
 export const WorkerFieldsFragmentDoc = gql`
     fragment WorkerFields on Worker {
   id
@@ -318,43 +355,18 @@ export const WorkerDetailedFieldsFragmentDoc = gql`
   }
 }
     ${WorkerFieldsFragmentDoc}`;
-export const WorkingGroupMetadataFieldsFragmentDoc = gql`
-    fragment WorkingGroupMetadataFields on WorkingGroupMetadata {
-  about
-  description
-  status
-  statusMessage
-}
-    `;
-export const WorkingGroupFieldsFragmentDoc = gql`
-    fragment WorkingGroupFields on WorkingGroup {
-  id
-  name
-  budget
-  metadata {
-    ...WorkingGroupMetadataFields
-  }
-  workers {
-    stake
-  }
-  leader {
-    membershipId
-    isActive
-  }
-}
-    ${WorkingGroupMetadataFieldsFragmentDoc}`;
 export const WorkingGroupDetailedFieldsFragmentDoc = gql`
     fragment WorkingGroupDetailedFields on WorkingGroup {
   ...WorkingGroupFields
+  workers {
+    ...WorkerDetailedFields
+  }
   leader {
-    id
-    runtimeId
-    stake
-    membershipId
-    rewardPerBlock
+    ...WorkerDetailedFields
   }
 }
-    ${WorkingGroupFieldsFragmentDoc}`;
+    ${WorkingGroupFieldsFragmentDoc}
+${WorkerDetailedFieldsFragmentDoc}`;
 export const BudgetSpendingEventFieldsFragmentDoc = gql`
     fragment BudgetSpendingEventFields on BudgetSpendingEvent {
   id
@@ -560,10 +572,10 @@ export const UpcomingWorkingGroupOpeningFieldsFragmentDoc = gql`
 export const GetWorkingGroupsDocument = gql`
     query GetWorkingGroups($where: WorkingGroupWhereInput, $orderBy: [WorkingGroupOrderByInput!], $offset: Int, $limit: Int) {
   workingGroups(where: $where, orderBy: $orderBy, offset: $offset, limit: $limit) {
-    ...WorkingGroupFields
+    ...WorkingGroupDetailedFields
   }
 }
-    ${WorkingGroupFieldsFragmentDoc}`;
+    ${WorkingGroupDetailedFieldsFragmentDoc}`;
 
 /**
  * __useGetWorkingGroupsQuery__
@@ -1556,3 +1568,50 @@ export function useGetWorkerUnstakingDetailsLazyQuery(baseOptions?: Apollo.LazyQ
 export type GetWorkerUnstakingDetailsQueryHookResult = ReturnType<typeof useGetWorkerUnstakingDetailsQuery>;
 export type GetWorkerUnstakingDetailsLazyQueryHookResult = ReturnType<typeof useGetWorkerUnstakingDetailsLazyQuery>;
 export type GetWorkerUnstakingDetailsQueryResult = Apollo.QueryResult<GetWorkerUnstakingDetailsQuery, GetWorkerUnstakingDetailsQueryVariables>;
+export const GetTerminatedWorkerEventsConnectionDocument = gql`
+    query GetTerminatedWorkerEventsConnection($where: TerminatedWorkerEventWhereInput, $orderBy: [TerminatedWorkerEventOrderByInput!], $first: Int, $last: Int, $after: String, $before: String) {
+  terminatedWorkerEventsConnection(
+    first: $first
+    after: $after
+    last: $last
+    before: $before
+    where: $where
+    orderBy: $orderBy
+  ) {
+    totalCount
+  }
+}
+    `;
+
+/**
+ * __useGetTerminatedWorkerEventsConnectionQuery__
+ *
+ * To run a query within a React component, call `useGetTerminatedWorkerEventsConnectionQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetTerminatedWorkerEventsConnectionQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetTerminatedWorkerEventsConnectionQuery({
+ *   variables: {
+ *      where: // value for 'where'
+ *      orderBy: // value for 'orderBy'
+ *      first: // value for 'first'
+ *      last: // value for 'last'
+ *      after: // value for 'after'
+ *      before: // value for 'before'
+ *   },
+ * });
+ */
+export function useGetTerminatedWorkerEventsConnectionQuery(baseOptions?: Apollo.QueryHookOptions<GetTerminatedWorkerEventsConnectionQuery, GetTerminatedWorkerEventsConnectionQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetTerminatedWorkerEventsConnectionQuery, GetTerminatedWorkerEventsConnectionQueryVariables>(GetTerminatedWorkerEventsConnectionDocument, options);
+      }
+export function useGetTerminatedWorkerEventsConnectionLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetTerminatedWorkerEventsConnectionQuery, GetTerminatedWorkerEventsConnectionQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetTerminatedWorkerEventsConnectionQuery, GetTerminatedWorkerEventsConnectionQueryVariables>(GetTerminatedWorkerEventsConnectionDocument, options);
+        }
+export type GetTerminatedWorkerEventsConnectionQueryHookResult = ReturnType<typeof useGetTerminatedWorkerEventsConnectionQuery>;
+export type GetTerminatedWorkerEventsConnectionLazyQueryHookResult = ReturnType<typeof useGetTerminatedWorkerEventsConnectionLazyQuery>;
+export type GetTerminatedWorkerEventsConnectionQueryResult = Apollo.QueryResult<GetTerminatedWorkerEventsConnectionQuery, GetTerminatedWorkerEventsConnectionQueryVariables>;
