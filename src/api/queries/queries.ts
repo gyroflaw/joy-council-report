@@ -6,6 +6,7 @@ import {
   asElectedCouncil,
   asProposal,
   asWorkingGroup,
+  Block,
   ElectedCouncil,
   Proposal,
   WorkingGroup,
@@ -46,7 +47,7 @@ export const getWorkingGroups = async (): Promise<WorkingGroup[]> => {
   return workingGroups.workingGroups.map(asWorkingGroup);
 };
 
-export const getWorkingGroupBudget = async (start: Date, end: Date) => {
+export const getWorkingGroupBudget = async (start: Block, end: Block) => {
   const workingGroups = await getWorkingGroups();
   const { GetBudgetSpending, getFundingProposalPaid } = getSdk(client);
 
@@ -58,8 +59,8 @@ export const getWorkingGroupBudget = async (start: Date, end: Date) => {
     const budgets = await GetBudgetSpending({
       where: {
         group: { id_eq: workingGroup.id },
-        createdAt_gte: start,
-        createdAt_lte: end,
+        createdAt_gte: start.timestamp,
+        createdAt_lte: end.timestamp,
       },
     });
     const budget = budgets.budgetSpendingEvents.reduce(
@@ -81,9 +82,46 @@ export const getWorkingGroupBudget = async (start: Date, end: Date) => {
     [key in WorkingGroup["id"]]: number | undefined;
   };
   for (const workingGroup of workingGroups) {
-    leadSalary[workingGroup.id] = workingGroup.leader
-      ? toJoy(workingGroup.leader.rewardPerBlock)
-      : undefined;
+    const { leader } = workingGroup;
+    if (!leader) {
+      continue;
+    }
+    let salary = BN_ZERO;
+    const rewards = leader.rewardPerBlock.mul(
+      new BN(end.number - start.number)
+    );
+    salary = salary.add(rewards);
+
+    const proposalPaidPromise = getFundingProposalPaid({
+      where: {
+        account_eq: leader.rewardAccount,
+        createdAt_gte: start.timestamp,
+        createdAt_lte: end.timestamp,
+      },
+    });
+    const directPaysPromise = GetBudgetSpending({
+      where: {
+        reciever_eq: leader.rewardAccount,
+        createdAt_gte: start.timestamp,
+        createdAt_lte: end.timestamp,
+      },
+    });
+    const [proposalPaid, directPays] = await Promise.all([
+      proposalPaidPromise,
+      directPaysPromise,
+    ]);
+
+    const paid = proposalPaid.requestFundedEvents
+      .map((e) => new BN(e.amount))
+      .reduce((a, b) => a.add(b), BN_ZERO);
+    salary = salary.add(paid);
+
+    const discretionarySpending = directPays.budgetSpendingEvents.reduce(
+      (total, { amount }) => total.add(new BN(amount)),
+      BN_ZERO
+    );
+    salary = salary.add(discretionarySpending);
+    leadSalary[workingGroup.id] = toJoy(salary);
   }
 
   const workersSalary = {} as {
@@ -92,20 +130,22 @@ export const getWorkingGroupBudget = async (start: Date, end: Date) => {
   for await (const workingGroup of workingGroups) {
     const salariesPromise = workingGroup.workers.map(async (worker) => {
       let salary = BN_ZERO;
-      salary = salary.add(worker.rewardPerBlock);
+      salary = salary.add(
+        worker.rewardPerBlock.mul(new BN(end.number - start.number))
+      );
 
       const proposalPaidPromise = getFundingProposalPaid({
         where: {
           account_eq: worker.rewardAccount,
-          createdAt_gte: start,
-          createdAt_lte: end,
+          createdAt_gte: start.timestamp,
+          createdAt_lte: end.timestamp,
         },
       });
       const directPaysPromise = GetBudgetSpending({
         where: {
           reciever_eq: worker.rewardAccount,
-          createdAt_gte: start,
-          createdAt_lte: end,
+          createdAt_gte: start.timestamp,
+          createdAt_lte: end.timestamp,
         },
       });
       const [proposalPaid, directPays] = await Promise.all([
@@ -215,12 +255,15 @@ export const getChannelStatus = async (start: Date, end: Date) => {
   const {
     channelsConnection: { totalCount: startCount },
   } = await GetChannelsCount({
-    where: { createdAt_lte: start },
+    where: {
+      createdAt_lte: start,
+      totalVideosCreated_gt: 0,
+    },
   });
   const {
     channelsConnection: { totalCount: endCount },
   } = await GetChannelsCount({
-    where: { createdAt_lte: end },
+    where: { createdAt_lte: end, totalVideosCreated_gt: 0 },
   });
   const growthCount = endCount - startCount;
   const growthPercent = (growthCount / startCount) * 100;
@@ -245,7 +288,10 @@ export const getChannelChartData = async (start: Date, end: Date) => {
   const {
     channelsConnection: { totalCount },
   } = await GetChannelsCount({
-    where: { createdAt_lte: new Date(startDate.getTime() - 24 * 3600 * 1000) },
+    where: {
+      createdAt_lte: new Date(startDate.getTime() - 24 * 3600 * 1000),
+      totalVideosCreated_gt: 0,
+    },
   });
   let prevCount = totalCount;
   for (
@@ -256,7 +302,7 @@ export const getChannelChartData = async (start: Date, end: Date) => {
     const {
       channelsConnection: { totalCount },
     } = await GetChannelsCount({
-      where: { createdAt_lte: date.toISOString() },
+      where: { createdAt_lte: date.toISOString(), totalVideosCreated_gt: 0 },
     });
     data.push({
       date: date,

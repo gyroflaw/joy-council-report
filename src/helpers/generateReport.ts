@@ -79,10 +79,7 @@ export async function generateReport(
       new BN(councilMembers.length * (endBlockNumber - startBlockNumber))
     )
   );
-  const workingGroupBudget = await getWorkingGroupBudget(
-    startBlockTimestamp,
-    endBlockTimestamp
-  );
+  const workingGroupBudget = await getWorkingGroupBudget(startBlock, endBlock);
   const fundingProposals = toJoy(
     await getFundingProposalPaid(startBlockTimestamp, endBlockTimestamp)
   );

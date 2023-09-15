@@ -76,7 +76,7 @@ export default function Charts() {
   return (
     <div>
       <JoyChart data={videoData} title="Videos" />
-      <JoyChart data={channelData} title="Channels" />
+      <JoyChart data={channelData} title="Non-empty channels" />
       <JoyChart data={membershipData} title="Membership" />
     </div>
   );

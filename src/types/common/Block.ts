@@ -11,8 +11,8 @@ export type NetworkType =
 
 export interface Block {
   number: number;
-  network: NetworkType;
-  timestamp: string;
+  network?: NetworkType;
+  timestamp: string | Date;
 }
 
 export interface BlockFields {
