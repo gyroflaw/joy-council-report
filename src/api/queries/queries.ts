@@ -94,14 +94,14 @@ export const getWorkingGroupBudget = async (start: Block, end: Block) => {
 
     const proposalPaidPromise = getFundingProposalPaid({
       where: {
-        account_eq: leader.rewardAccount,
+        account_in: leader.membership.boundAccounts,
         createdAt_gte: start.timestamp,
         createdAt_lte: end.timestamp,
       },
     });
     const directPaysPromise = GetBudgetSpending({
       where: {
-        reciever_eq: leader.rewardAccount,
+        reciever_in: leader.membership.boundAccounts,
         createdAt_gte: start.timestamp,
         createdAt_lte: end.timestamp,
       },
@@ -136,14 +136,14 @@ export const getWorkingGroupBudget = async (start: Block, end: Block) => {
 
       const proposalPaidPromise = getFundingProposalPaid({
         where: {
-          account_eq: worker.rewardAccount,
+          account_in: worker.membership.boundAccounts,
           createdAt_gte: start.timestamp,
           createdAt_lte: end.timestamp,
         },
       });
       const directPaysPromise = GetBudgetSpending({
         where: {
-          reciever_eq: worker.rewardAccount,
+          reciever_in: worker.membership.boundAccounts,
           createdAt_gte: start.timestamp,
           createdAt_lte: end.timestamp,
         },

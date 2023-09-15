@@ -19,7 +19,7 @@ export interface WorkerBaseInfo {
 export interface Worker {
   id: string;
   runtimeId: number;
-  membership: Pick<Member, "id" | "controllerAccount">;
+  membership: Pick<Member, "id" | "controllerAccount" | "boundAccounts">;
   group: Pick<WorkingGroup, "id" | "name">;
   status: WorkerStatusTypename;
   isLead: boolean;
@@ -75,6 +75,7 @@ export const asWorker = (fields: WorkerFieldsFragment): Worker => ({
   membership: {
     id: fields.membership.id,
     controllerAccount: fields.membership.controllerAccount,
+    boundAccounts: fields.membership.boundAccounts,
   },
   status: fields.status.__typename,
   isLead: fields.isLead,
