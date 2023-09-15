@@ -28,7 +28,7 @@ function JoyChart({ data, title }: { data: DailyData[]; title: string }) {
       <h3>{title}</h3>
       {data.length > 0 && (
         <BarChart width={730} height={250} data={data}>
-          <CartesianGrid strokeDasharray="3 3" />
+          <CartesianGrid strokeDasharray="3 3" horizontal vertical={false} />
           <XAxis
             dataKey="date"
             tickFormatter={(val: Date) => {
@@ -56,23 +56,20 @@ export default function Charts() {
     (async () => {
       if (!council) return;
 
-      const videoData = await getVideoChartData(
+      getVideoChartData(
         new Date(council.electedAt.timestamp),
         council.endedAt ? new Date(council.endedAt.timestamp) : new Date()
-      );
-      setVideoData(videoData);
+      ).then(setVideoData);
 
-      const channelData = await getChannelChartData(
+      getChannelChartData(
         new Date(council.electedAt.timestamp),
         council.endedAt ? new Date(council.endedAt.timestamp) : new Date()
-      );
-      setChannelData(channelData);
+      ).then(setChannelData);
 
-      const membershipData = await getMembershipChartData(
+      getMembershipChartData(
         new Date(council.electedAt.timestamp),
         council.endedAt ? new Date(council.endedAt.timestamp) : new Date()
-      );
-      setMembershipData(membershipData);
+      ).then(setMembershipData);
     })();
   }, [council]);
 
