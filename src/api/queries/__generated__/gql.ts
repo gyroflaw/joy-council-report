@@ -37336,6 +37336,27 @@ export type GetElectionsQuery = { __typename: 'Query', electionRounds: Array<{ _
 
 export type ElectionRoundFieldsFragment = { __typename: 'ElectionRound', id: string, cycleId: number, endedAtBlock?: number | null, endedAtTime?: any | null, endedAtNetwork?: Network | null, candidates: Array<{ __typename: 'Candidate', stake: string }>, castVotes: Array<{ __typename: 'CastVote', voteForId?: string | null }> };
 
+export type GetForumPostsCountQueryVariables = Exact<{
+  where?: InputMaybe<ForumPostWhereInput>;
+}>;
+
+
+export type GetForumPostsCountQuery = { __typename: 'Query', forumPostsConnection: { __typename: 'ForumPostConnection', totalCount: number }, forumPosts: Array<{ __typename: 'ForumPost', createdAt: any }> };
+
+export type GetForumThreadsCountQueryVariables = Exact<{
+  where?: InputMaybe<ForumThreadWhereInput>;
+}>;
+
+
+export type GetForumThreadsCountQuery = { __typename: 'Query', forumThreadsConnection: { __typename: 'ForumThreadConnection', totalCount: number } };
+
+export type GetForumCategoriesCountQueryVariables = Exact<{
+  where?: InputMaybe<ForumCategoryWhereInput>;
+}>;
+
+
+export type GetForumCategoriesCountQuery = { __typename: 'Query', forumCategoriesConnection: { __typename: 'ForumCategoryConnection', totalCount: number } };
+
 export type GetFundingProposalPaidQueryVariables = Exact<{
   where?: InputMaybe<RequestFundedEventWhereInput>;
   orderBy?: InputMaybe<Array<RequestFundedEventOrderByInput> | RequestFundedEventOrderByInput>;
@@ -37396,13 +37417,6 @@ export type GetNftSaleCountQueryVariables = Exact<{
 
 export type GetNftSaleCountQuery = { __typename: 'Query', nftBoughtEventsConnection: { __typename: 'NftBoughtEventConnection', totalCount: number } };
 
-export type GetForumPostsCountQueryVariables = Exact<{
-  where?: InputMaybe<ForumPostWhereInput>;
-}>;
-
-
-export type GetForumPostsCountQuery = { __typename: 'Query', forumPostsConnection: { __typename: 'ForumPostConnection', totalCount: number }, forumPosts: Array<{ __typename: 'ForumPost', createdAt: any }> };
-
 export type GetCreatedProposalsCountQueryVariables = Exact<{
   where?: InputMaybe<ProposalCreatedEventWhereInput>;
 }>;
@@ -37429,12 +37443,15 @@ export type GetProposalsQuery = { __typename: 'Query', proposals: Array<{ __type
 
 export type ProposalFieldsFragment = { __typename: 'Proposal', id: string, title: string, statusSetAtTime: any, createdAt: any, councilApprovals: number, exactExecutionBlock?: number | null, status: { __typename: 'ProposalStatusCanceledByRuntime' } | { __typename: 'ProposalStatusCancelled' } | { __typename: 'ProposalStatusDeciding' } | { __typename: 'ProposalStatusDormant' } | { __typename: 'ProposalStatusExecuted' } | { __typename: 'ProposalStatusExecutionFailed' } | { __typename: 'ProposalStatusExpired' } | { __typename: 'ProposalStatusGracing' } | { __typename: 'ProposalStatusRejected' } | { __typename: 'ProposalStatusSlashed' } | { __typename: 'ProposalStatusVetoed' }, details: { __typename: 'AmendConstitutionProposalDetails' } | { __typename: 'CancelWorkingGroupLeadOpeningProposalDetails' } | { __typename: 'CreateWorkingGroupLeadOpeningProposalDetails' } | { __typename: 'DecreaseWorkingGroupLeadStakeProposalDetails' } | { __typename: 'FillWorkingGroupLeadOpeningProposalDetails' } | { __typename: 'FundingRequestProposalDetails' } | { __typename: 'RuntimeUpgradeProposalDetails' } | { __typename: 'SetCouncilBudgetIncrementProposalDetails' } | { __typename: 'SetCouncilorRewardProposalDetails' } | { __typename: 'SetInitialInvitationBalanceProposalDetails' } | { __typename: 'SetInitialInvitationCountProposalDetails' } | { __typename: 'SetMaxValidatorCountProposalDetails' } | { __typename: 'SetMembershipLeadInvitationQuotaProposalDetails' } | { __typename: 'SetMembershipPriceProposalDetails' } | { __typename: 'SetReferralCutProposalDetails' } | { __typename: 'SetWorkingGroupLeadRewardProposalDetails' } | { __typename: 'SignalProposalDetails' } | { __typename: 'SlashWorkingGroupLeadProposalDetails' } | { __typename: 'TerminateWorkingGroupLeadProposalDetails' } | { __typename: 'UpdateChannelPayoutsProposalDetails' } | { __typename: 'UpdateWorkingGroupBudgetProposalDetails' } | { __typename: 'VetoProposalDetails' }, creator: { __typename: 'Membership', id: string, rootAccount: string, controllerAccount: string, boundAccounts: Array<string>, handle: string, isVerified: boolean, isFoundingMember: boolean, isCouncilMember: boolean, inviteCount: number, createdAt: any, metadata: { __typename: 'MemberMetadata', name?: string | null, about?: string | null, avatar?: { __typename: 'AvatarObject' } | { __typename: 'AvatarUri', avatarUri: string } | null }, roles: Array<{ __typename: 'Worker', id: string, createdAt: any, isLead: boolean, group: { __typename: 'WorkingGroup', name: string } }>, stakingaccountaddedeventmember?: Array<{ __typename: 'StakingAccountAddedEvent', createdAt: any, inBlock: number, network: Network, account: string }> | null } };
 
-export type GetForumThreadsCountQueryVariables = Exact<{
-  where?: InputMaybe<ForumThreadWhereInput>;
+export type GetStorageDataObjectsQueryVariables = Exact<{
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  where?: InputMaybe<StorageDataObjectWhereInput>;
+  orderBy?: InputMaybe<Array<StorageDataObjectOrderByInput> | StorageDataObjectOrderByInput>;
 }>;
 
 
-export type GetForumThreadsCountQuery = { __typename: 'Query', forumThreadsConnection: { __typename: 'ForumThreadConnection', totalCount: number } };
+export type GetStorageDataObjectsQuery = { __typename: 'Query', storageDataObjects: Array<{ __typename: 'StorageDataObject', id: string, createdAt: any, size: string, videoMedia?: { __typename: 'Video', title?: string | null } | null }> };
 
 export type MintedTokensQueryVariables = Exact<{
   where?: InputMaybe<RewardPaymentEventWhereInput>;
@@ -37736,6 +37753,18 @@ export type GetTerminatedWorkerEventsConnectionQueryVariables = Exact<{
 
 
 export type GetTerminatedWorkerEventsConnectionQuery = { __typename: 'Query', terminatedWorkerEventsConnection: { __typename: 'TerminatedWorkerEventConnection', totalCount: number } };
+
+export type GetOpeningFilledEventsConnectionQueryVariables = Exact<{
+  first?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  where?: InputMaybe<OpeningFilledEventWhereInput>;
+  orderBy?: InputMaybe<Array<OpeningFilledEventOrderByInput> | OpeningFilledEventOrderByInput>;
+}>;
+
+
+export type GetOpeningFilledEventsConnectionQuery = { __typename: 'Query', openingFilledEventsConnection: { __typename: 'OpeningFilledEventConnection', totalCount: number } };
 
 export const StorageDataObjectFieldsFragmentDoc = gql`
     fragment StorageDataObjectFields on StorageDataObject {
@@ -38266,6 +38295,30 @@ export const GetElectionsDocument = gql`
   }
 }
     ${ElectionRoundFieldsFragmentDoc}`;
+export const GetForumPostsCountDocument = gql`
+    query GetForumPostsCount($where: ForumPostWhereInput) {
+  forumPostsConnection(first: 0, where: $where) {
+    totalCount
+  }
+  forumPosts {
+    createdAt
+  }
+}
+    `;
+export const GetForumThreadsCountDocument = gql`
+    query GetForumThreadsCount($where: ForumThreadWhereInput) {
+  forumThreadsConnection(first: 0, where: $where) {
+    totalCount
+  }
+}
+    `;
+export const GetForumCategoriesCountDocument = gql`
+    query GetForumCategoriesCount($where: ForumCategoryWhereInput) {
+  forumCategoriesConnection(first: 0, where: $where) {
+    totalCount
+  }
+}
+    `;
 export const GetFundingProposalPaidDocument = gql`
     query getFundingProposalPaid($where: RequestFundedEventWhereInput, $orderBy: [RequestFundedEventOrderByInput!], $offset: Int, $limit: Int) {
   requestFundedEvents(
@@ -38334,16 +38387,6 @@ export const GetNftSaleCountDocument = gql`
   }
 }
     `;
-export const GetForumPostsCountDocument = gql`
-    query GetForumPostsCount($where: ForumPostWhereInput) {
-  forumPostsConnection(first: 0, where: $where) {
-    totalCount
-  }
-  forumPosts {
-    createdAt
-  }
-}
-    `;
 export const GetCreatedProposalsCountDocument = gql`
     query getCreatedProposalsCount($where: ProposalCreatedEventWhereInput) {
   proposalCreatedEventsConnection(where: $where) {
@@ -38365,10 +38408,20 @@ export const GetProposalsDocument = gql`
   }
 }
     ${ProposalFieldsFragmentDoc}`;
-export const GetForumThreadsCountDocument = gql`
-    query GetForumThreadsCount($where: ForumThreadWhereInput) {
-  forumThreadsConnection(first: 0, where: $where) {
-    totalCount
+export const GetStorageDataObjectsDocument = gql`
+    query GetStorageDataObjects($offset: Int, $limit: Int, $where: StorageDataObjectWhereInput, $orderBy: [StorageDataObjectOrderByInput!]) {
+  storageDataObjects(
+    limit: $limit
+    offset: $offset
+    where: $where
+    orderBy: $orderBy
+  ) {
+    id
+    createdAt
+    size
+    videoMedia {
+      title
+    }
   }
 }
     `;
@@ -38685,6 +38738,20 @@ export const GetTerminatedWorkerEventsConnectionDocument = gql`
   }
 }
     `;
+export const GetOpeningFilledEventsConnectionDocument = gql`
+    query GetOpeningFilledEventsConnection($first: Int, $after: String, $last: Int, $before: String, $where: OpeningFilledEventWhereInput, $orderBy: [OpeningFilledEventOrderByInput!]) {
+  openingFilledEventsConnection(
+    first: $first
+    after: $after
+    last: $last
+    before: $before
+    where: $where
+    orderBy: $orderBy
+  ) {
+    totalCount
+  }
+}
+    `;
 
 export type SdkFunctionWrapper = <T>(action: (requestHeaders?:Record<string, string>) => Promise<T>, operationName: string, operationType?: string) => Promise<T>;
 
@@ -38704,6 +38771,15 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     GetElections(variables?: GetElectionsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetElectionsQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetElectionsQuery>(GetElectionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'GetElections', 'query');
+    },
+    GetForumPostsCount(variables?: GetForumPostsCountQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetForumPostsCountQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetForumPostsCountQuery>(GetForumPostsCountDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'GetForumPostsCount', 'query');
+    },
+    GetForumThreadsCount(variables?: GetForumThreadsCountQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetForumThreadsCountQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetForumThreadsCountQuery>(GetForumThreadsCountDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'GetForumThreadsCount', 'query');
+    },
+    GetForumCategoriesCount(variables?: GetForumCategoriesCountQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetForumCategoriesCountQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetForumCategoriesCountQuery>(GetForumCategoriesCountDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'GetForumCategoriesCount', 'query');
     },
     getFundingProposalPaid(variables?: GetFundingProposalPaidQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetFundingProposalPaidQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetFundingProposalPaidQuery>(GetFundingProposalPaidDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getFundingProposalPaid', 'query');
@@ -38726,9 +38802,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     GetNftSaleCount(variables?: GetNftSaleCountQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetNftSaleCountQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetNftSaleCountQuery>(GetNftSaleCountDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'GetNftSaleCount', 'query');
     },
-    GetForumPostsCount(variables?: GetForumPostsCountQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetForumPostsCountQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetForumPostsCountQuery>(GetForumPostsCountDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'GetForumPostsCount', 'query');
-    },
     getCreatedProposalsCount(variables?: GetCreatedProposalsCountQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetCreatedProposalsCountQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetCreatedProposalsCountQuery>(GetCreatedProposalsCountDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getCreatedProposalsCount', 'query');
     },
@@ -38738,8 +38811,8 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     getProposals(variables?: GetProposalsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetProposalsQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetProposalsQuery>(GetProposalsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProposals', 'query');
     },
-    GetForumThreadsCount(variables?: GetForumThreadsCountQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetForumThreadsCountQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetForumThreadsCountQuery>(GetForumThreadsCountDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'GetForumThreadsCount', 'query');
+    GetStorageDataObjects(variables?: GetStorageDataObjectsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetStorageDataObjectsQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetStorageDataObjectsQuery>(GetStorageDataObjectsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'GetStorageDataObjects', 'query');
     },
     mintedTokens(variables?: MintedTokensQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<MintedTokensQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<MintedTokensQuery>(MintedTokensDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'mintedTokens', 'query');
@@ -38842,6 +38915,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     GetTerminatedWorkerEventsConnection(variables?: GetTerminatedWorkerEventsConnectionQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetTerminatedWorkerEventsConnectionQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetTerminatedWorkerEventsConnectionQuery>(GetTerminatedWorkerEventsConnectionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'GetTerminatedWorkerEventsConnection', 'query');
+    },
+    GetOpeningFilledEventsConnection(variables?: GetOpeningFilledEventsConnectionQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetOpeningFilledEventsConnectionQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetOpeningFilledEventsConnectionQuery>(GetOpeningFilledEventsConnectionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'GetOpeningFilledEventsConnection', 'query');
     }
   };
 }

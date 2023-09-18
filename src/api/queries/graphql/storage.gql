@@ -1,0 +1,20 @@
+query GetStorageDataObjects(
+  $offset: Int
+  $limit: Int
+  $where: StorageDataObjectWhereInput
+  $orderBy: [StorageDataObjectOrderByInput!]
+) {
+  storageDataObjects(
+    limit: $limit
+    offset: $offset
+    where: $where
+    orderBy: $orderBy
+  ) {
+    id
+    createdAt
+    size
+    videoMedia {
+      title
+    }
+  }
+}

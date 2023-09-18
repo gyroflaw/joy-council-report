@@ -542,3 +542,23 @@ query GetTerminatedWorkerEventsConnection(
     totalCount
   }
 }
+
+query GetOpeningFilledEventsConnection(
+  $first: Int
+  $after: String
+  $last: Int
+  $before: String
+  $where: OpeningFilledEventWhereInput
+  $orderBy: [OpeningFilledEventOrderByInput!]
+) {
+  openingFilledEventsConnection(
+    first: $first
+    after: $after
+    last: $last
+    before: $before
+    where: $where
+    orderBy: $orderBy
+  ) {
+    totalCount
+  }
+}

@@ -1,0 +1,21 @@
+query GetForumPostsCount($where: ForumPostWhereInput) {
+  forumPostsConnection(first: 0, where: $where) {
+    totalCount
+  }
+
+  forumPosts {
+    createdAt
+  }
+}
+
+query GetForumThreadsCount($where: ForumThreadWhereInput) {
+  forumThreadsConnection(first: 0, where: $where) {
+    totalCount
+  }
+}
+
+query GetForumCategoriesCount($where: ForumCategoryWhereInput) {
+  forumCategoriesConnection(first: 0, where: $where) {
+    totalCount
+  }
+}

@@ -257,6 +257,18 @@ export type GetTerminatedWorkerEventsConnectionQueryVariables = Types.Exact<{
 
 export type GetTerminatedWorkerEventsConnectionQuery = { __typename: 'Query', terminatedWorkerEventsConnection: { __typename: 'TerminatedWorkerEventConnection', totalCount: number } };
 
+export type GetOpeningFilledEventsConnectionQueryVariables = Types.Exact<{
+  first?: Types.InputMaybe<Types.Scalars['Int']['input']>;
+  after?: Types.InputMaybe<Types.Scalars['String']['input']>;
+  last?: Types.InputMaybe<Types.Scalars['Int']['input']>;
+  before?: Types.InputMaybe<Types.Scalars['String']['input']>;
+  where?: Types.InputMaybe<Types.OpeningFilledEventWhereInput>;
+  orderBy?: Types.InputMaybe<Array<Types.OpeningFilledEventOrderByInput> | Types.OpeningFilledEventOrderByInput>;
+}>;
+
+
+export type GetOpeningFilledEventsConnectionQuery = { __typename: 'Query', openingFilledEventsConnection: { __typename: 'OpeningFilledEventConnection', totalCount: number } };
+
 export const PastWorkerFieldsFragmentDoc = gql`
     fragment PastWorkerFields on Worker {
   id
@@ -1615,3 +1627,50 @@ export function useGetTerminatedWorkerEventsConnectionLazyQuery(baseOptions?: Ap
 export type GetTerminatedWorkerEventsConnectionQueryHookResult = ReturnType<typeof useGetTerminatedWorkerEventsConnectionQuery>;
 export type GetTerminatedWorkerEventsConnectionLazyQueryHookResult = ReturnType<typeof useGetTerminatedWorkerEventsConnectionLazyQuery>;
 export type GetTerminatedWorkerEventsConnectionQueryResult = Apollo.QueryResult<GetTerminatedWorkerEventsConnectionQuery, GetTerminatedWorkerEventsConnectionQueryVariables>;
+export const GetOpeningFilledEventsConnectionDocument = gql`
+    query GetOpeningFilledEventsConnection($first: Int, $after: String, $last: Int, $before: String, $where: OpeningFilledEventWhereInput, $orderBy: [OpeningFilledEventOrderByInput!]) {
+  openingFilledEventsConnection(
+    first: $first
+    after: $after
+    last: $last
+    before: $before
+    where: $where
+    orderBy: $orderBy
+  ) {
+    totalCount
+  }
+}
+    `;
+
+/**
+ * __useGetOpeningFilledEventsConnectionQuery__
+ *
+ * To run a query within a React component, call `useGetOpeningFilledEventsConnectionQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetOpeningFilledEventsConnectionQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetOpeningFilledEventsConnectionQuery({
+ *   variables: {
+ *      first: // value for 'first'
+ *      after: // value for 'after'
+ *      last: // value for 'last'
+ *      before: // value for 'before'
+ *      where: // value for 'where'
+ *      orderBy: // value for 'orderBy'
+ *   },
+ * });
+ */
+export function useGetOpeningFilledEventsConnectionQuery(baseOptions?: Apollo.QueryHookOptions<GetOpeningFilledEventsConnectionQuery, GetOpeningFilledEventsConnectionQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetOpeningFilledEventsConnectionQuery, GetOpeningFilledEventsConnectionQueryVariables>(GetOpeningFilledEventsConnectionDocument, options);
+      }
+export function useGetOpeningFilledEventsConnectionLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetOpeningFilledEventsConnectionQuery, GetOpeningFilledEventsConnectionQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetOpeningFilledEventsConnectionQuery, GetOpeningFilledEventsConnectionQueryVariables>(GetOpeningFilledEventsConnectionDocument, options);
+        }
+export type GetOpeningFilledEventsConnectionQueryHookResult = ReturnType<typeof useGetOpeningFilledEventsConnectionQuery>;
+export type GetOpeningFilledEventsConnectionLazyQueryHookResult = ReturnType<typeof useGetOpeningFilledEventsConnectionLazyQuery>;
+export type GetOpeningFilledEventsConnectionQueryResult = Apollo.QueryResult<GetOpeningFilledEventsConnectionQuery, GetOpeningFilledEventsConnectionQueryVariables>;
