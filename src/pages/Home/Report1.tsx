@@ -52,6 +52,7 @@ export default function Report1() {
       >
         {loading ? "Generating..." : "Generate report"}
       </button>
+      <h4>Given Block Stats</h4>
       <ReactJson src={report1} theme="monokai" collapsed />
     </div>
   );

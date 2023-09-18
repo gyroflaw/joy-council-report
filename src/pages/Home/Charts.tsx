@@ -15,6 +15,7 @@ import {
   getVideoNftChartData,
   getChannelChartData,
   getMembershipChartData,
+  getStorageChartData,
 } from "@/api";
 import { useSelectedCouncil } from "@/store";
 
@@ -54,6 +55,7 @@ export default function Charts() {
   const [videoNftData, setVideoNftData] = useState<DailyData[]>([]);
   const [channelData, setChannelData] = useState<DailyData[]>([]);
   const [membershipData, setMembershipData] = useState<DailyData[]>([]);
+  const [storageData, setStorageData] = useState<DailyData[]>([]);
   useEffect(() => {
     (async () => {
       if (!council) return;
@@ -77,6 +79,11 @@ export default function Charts() {
         new Date(council.electedAt.timestamp),
         council.endedAt ? new Date(council.endedAt.timestamp) : new Date()
       ).then(setMembershipData);
+
+      getStorageChartData(
+        new Date(council.electedAt.timestamp),
+        council.endedAt ? new Date(council.endedAt.timestamp) : new Date()
+      ).then(setStorageData);
     })();
   }, [council]);
 
@@ -86,6 +93,7 @@ export default function Charts() {
       <JoyChart data={videoNftData} title="Video NFTs" />
       <JoyChart data={channelData} title="Non-empty channels" />
       <JoyChart data={membershipData} title="Membership" />
+      <JoyChart data={storageData} title="Storage(MBytes)" />
     </div>
   );
 }

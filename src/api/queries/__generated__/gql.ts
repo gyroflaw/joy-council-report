@@ -37754,6 +37754,18 @@ export type GetTerminatedWorkerEventsConnectionQueryVariables = Exact<{
 
 export type GetTerminatedWorkerEventsConnectionQuery = { __typename: 'Query', terminatedWorkerEventsConnection: { __typename: 'TerminatedWorkerEventConnection', totalCount: number } };
 
+export type GetWorkerExitedEventsConnectionQueryVariables = Exact<{
+  first?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  where?: InputMaybe<WorkerExitedEventWhereInput>;
+  orderBy?: InputMaybe<Array<WorkerExitedEventOrderByInput> | WorkerExitedEventOrderByInput>;
+}>;
+
+
+export type GetWorkerExitedEventsConnectionQuery = { __typename: 'Query', workerExitedEventsConnection: { __typename: 'WorkerExitedEventConnection', totalCount: number } };
+
 export type GetOpeningFilledEventsConnectionQueryVariables = Exact<{
   first?: InputMaybe<Scalars['Int']['input']>;
   after?: InputMaybe<Scalars['String']['input']>;
@@ -38738,6 +38750,20 @@ export const GetTerminatedWorkerEventsConnectionDocument = gql`
   }
 }
     `;
+export const GetWorkerExitedEventsConnectionDocument = gql`
+    query GetWorkerExitedEventsConnection($first: Int, $after: String, $last: Int, $before: String, $where: WorkerExitedEventWhereInput, $orderBy: [WorkerExitedEventOrderByInput!]) {
+  workerExitedEventsConnection(
+    first: $first
+    after: $after
+    last: $last
+    before: $before
+    where: $where
+    orderBy: $orderBy
+  ) {
+    totalCount
+  }
+}
+    `;
 export const GetOpeningFilledEventsConnectionDocument = gql`
     query GetOpeningFilledEventsConnection($first: Int, $after: String, $last: Int, $before: String, $where: OpeningFilledEventWhereInput, $orderBy: [OpeningFilledEventOrderByInput!]) {
   openingFilledEventsConnection(
@@ -38915,6 +38941,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     GetTerminatedWorkerEventsConnection(variables?: GetTerminatedWorkerEventsConnectionQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetTerminatedWorkerEventsConnectionQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetTerminatedWorkerEventsConnectionQuery>(GetTerminatedWorkerEventsConnectionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'GetTerminatedWorkerEventsConnection', 'query');
+    },
+    GetWorkerExitedEventsConnection(variables?: GetWorkerExitedEventsConnectionQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetWorkerExitedEventsConnectionQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetWorkerExitedEventsConnectionQuery>(GetWorkerExitedEventsConnectionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'GetWorkerExitedEventsConnection', 'query');
     },
     GetOpeningFilledEventsConnection(variables?: GetOpeningFilledEventsConnectionQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetOpeningFilledEventsConnectionQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetOpeningFilledEventsConnectionQuery>(GetOpeningFilledEventsConnectionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'GetOpeningFilledEventsConnection', 'query');

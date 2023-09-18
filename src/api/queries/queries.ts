@@ -242,7 +242,7 @@ export const getVideoChartData = async (start: Date, end: Date) => {
   for (
     let date = startDate;
     date <= endDate;
-    date = new Date(date.setDate(date.getDate() + 1))
+    date = new Date(date.getTime() + 24 * 3600 * 1000)
   ) {
     const {
       videosConnection: { totalCount },
@@ -308,7 +308,7 @@ export const getChannelChartData = async (start: Date, end: Date) => {
   for (
     let date = startDate;
     date <= endDate;
-    date = new Date(date.setDate(date.getDate() + 1))
+    date = new Date(date.getTime() + 24 * 3600 * 1000)
   ) {
     const {
       channelsConnection: { totalCount },
@@ -392,7 +392,7 @@ export const getVideoNftChartData = async (start: Date, end: Date) => {
   for (
     let date = startDate;
     date <= endDate;
-    date = new Date(date.setDate(date.getDate() + 1))
+    date = new Date(date.getTime() + 24 * 3600 * 1000)
   ) {
     const {
       nftIssuedEventsConnection: { totalCount },
@@ -451,7 +451,7 @@ export const getMembershipChartData = async (start: Date, end: Date) => {
   for (
     let date = startDate;
     date <= endDate;
-    date = new Date(date.setDate(date.getDate() + 1))
+    date = new Date(date.getTime() + 24 * 3600 * 1000)
   ) {
     const {
       membershipsConnection: { totalCount },
@@ -566,8 +566,12 @@ export const getForumStatus = async (start: Date, end: Date) => {
 };
 
 export const getWorkingGroupStatus = async (start: Date, end: Date) => {
-  const { GetWorkingGroupOpenings, GetWorkingGroupApplications } =
-    getSdk(client);
+  const {
+    GetWorkingGroupOpenings,
+    GetWorkingGroupApplications,
+    GetOpeningFilledEventsConnection,
+    GetTerminatedWorkerEventsConnection,
+  } = getSdk(client);
 
   const { workingGroupOpenings: startOpenings } = await GetWorkingGroupOpenings(
     {
@@ -587,7 +591,31 @@ export const getWorkingGroupStatus = async (start: Date, end: Date) => {
       where: { createdAt_lte: end },
     });
 
-  // TODO: Total Filled positions
+  const {
+    openingFilledEventsConnection: { totalCount: startFilledCount },
+  } = await GetOpeningFilledEventsConnection({
+    where: { createdAt_lte: start },
+  });
+  const {
+    openingFilledEventsConnection: { totalCount: endFilledCount },
+  } = await GetOpeningFilledEventsConnection({
+    where: { createdAt_lte: end },
+  });
+  const filledCount = endFilledCount - startFilledCount;
+
+  const {
+    terminatedWorkerEventsConnection: { totalCount: startTerminatedCount },
+  } = await GetTerminatedWorkerEventsConnection({
+    where: { createdAt_lte: start },
+  });
+  const {
+    terminatedWorkerEventsConnection: { totalCount: endTerminatedCount },
+  } = await GetTerminatedWorkerEventsConnection({
+    where: { createdAt_lte: end },
+  });
+  const terminatedCount = endTerminatedCount - startTerminatedCount;
+
+  // TODO: Left count
 
   return {
     openings: {
@@ -598,5 +626,47 @@ export const getWorkingGroupStatus = async (start: Date, end: Date) => {
       startCount: startApplications.length,
       endCount: endApplications.length,
     },
+    filledCount,
+    terminatedCount,
   };
+};
+
+export const getStorageStatus = async (start: Date, end: Date) => {
+  const { GetStorageDataObjects } = getSdk(client);
+  const { storageDataObjects } = await GetStorageDataObjects({
+    where: {
+      createdAt_gte: start,
+      createdAt_lte: end,
+    },
+  });
+  const size = storageDataObjects
+    .map((d) => parseInt(d.size), 10)
+    .reduce((a, b) => a + b, 0);
+
+  return size;
+};
+
+export const getStorageChartData = async (start: Date, end: Date) => {
+  const startDate = new Date(start.toDateString());
+  const endDate = new Date(end.toDateString());
+
+  // iterate over days
+  const data = [];
+
+  for (
+    let date = startDate;
+    date <= endDate;
+    date = new Date(date.getTime() + 24 * 3600 * 1000)
+  ) {
+    const size = await getStorageStatus(
+      date,
+      new Date(date.getTime() + 24 * 3600 * 1000)
+    );
+    data.push({
+      date: date,
+      count: parseFloat((size / 1000 / 1000).toFixed(2)),
+    });
+  }
+
+  return data;
 };
