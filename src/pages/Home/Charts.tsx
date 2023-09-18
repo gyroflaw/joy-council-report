@@ -12,6 +12,7 @@ import ReactJson from "react-json-view";
 
 import {
   getVideoChartData,
+  getVideoNftChartData,
   getChannelChartData,
   getMembershipChartData,
 } from "@/api";
@@ -50,6 +51,7 @@ function JoyChart({ data, title }: { data: DailyData[]; title: string }) {
 export default function Charts() {
   const { council } = useSelectedCouncil();
   const [videoData, setVideoData] = useState<DailyData[]>([]);
+  const [videoNftData, setVideoNftData] = useState<DailyData[]>([]);
   const [channelData, setChannelData] = useState<DailyData[]>([]);
   const [membershipData, setMembershipData] = useState<DailyData[]>([]);
   useEffect(() => {
@@ -60,6 +62,11 @@ export default function Charts() {
         new Date(council.electedAt.timestamp),
         council.endedAt ? new Date(council.endedAt.timestamp) : new Date()
       ).then(setVideoData);
+
+      getVideoNftChartData(
+        new Date(council.electedAt.timestamp),
+        council.endedAt ? new Date(council.endedAt.timestamp) : new Date()
+      ).then(setVideoNftData);
 
       getChannelChartData(
         new Date(council.electedAt.timestamp),
@@ -76,6 +83,7 @@ export default function Charts() {
   return (
     <div>
       <JoyChart data={videoData} title="Videos" />
+      <JoyChart data={videoNftData} title="Video NFTs" />
       <JoyChart data={channelData} title="Non-empty channels" />
       <JoyChart data={membershipData} title="Membership" />
     </div>

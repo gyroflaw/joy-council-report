@@ -374,6 +374,41 @@ export const getVideoNftStatus = async (start: Date, end: Date) => {
   };
 };
 
+export const getVideoNftChartData = async (start: Date, end: Date) => {
+  const { GetNftIssuedCount } = getSdk(client);
+
+  const startDate = new Date(start.toDateString());
+  const endDate = new Date(end.toDateString());
+
+  // iterate over days
+  const data = [];
+
+  const {
+    nftIssuedEventsConnection: { totalCount },
+  } = await GetNftIssuedCount({
+    where: { createdAt_lte: new Date(startDate.getTime() - 24 * 3600 * 1000) },
+  });
+  let prevCount = totalCount;
+  for (
+    let date = startDate;
+    date <= endDate;
+    date = new Date(date.setDate(date.getDate() + 1))
+  ) {
+    const {
+      nftIssuedEventsConnection: { totalCount },
+    } = await GetNftIssuedCount({
+      where: { createdAt_lte: date.toISOString() },
+    });
+    data.push({
+      date: date,
+      count: totalCount - prevCount,
+    });
+    prevCount = totalCount;
+  }
+
+  return data;
+};
+
 export const getMembershipStatus = async (start: Date, end: Date) => {
   const { GetMembersCount } = getSdk(client);
 
@@ -448,6 +483,30 @@ export const getProposals = async (
   return proposals.map(asProposal);
 };
 
+export const getForumCategoryStatus = async (start: Date, end: Date) => {
+  const { GetForumCategoriesCount } = getSdk(client);
+
+  const {
+    forumCategoriesConnection: { totalCount: startCount },
+  } = await GetForumCategoriesCount({
+    where: { createdAt_lte: start },
+  });
+  const {
+    forumCategoriesConnection: { totalCount: endCount },
+  } = await GetForumCategoriesCount({
+    where: { createdAt_lte: end },
+  });
+  const growthCount = endCount - startCount;
+  const growthPercent = (growthCount / startCount) * 100;
+
+  return {
+    startCount,
+    endCount,
+    growthCount,
+    growthPercent,
+  };
+};
+
 export const getForumThreadStatus = async (start: Date, end: Date) => {
   const { GetForumThreadsCount } = getSdk(client);
 
@@ -497,12 +556,13 @@ export const getForumPostStatus = async (start: Date, end: Date) => {
 };
 
 export const getForumStatus = async (start: Date, end: Date) => {
-  const [thread, post] = await Promise.all([
+  const [category, thread, post] = await Promise.all([
+    getForumCategoryStatus(start, end),
     getForumThreadStatus(start, end),
     getForumPostStatus(start, end),
   ]);
 
-  return { thread, post };
+  return { category, thread, post };
 };
 
 export const getWorkingGroupStatus = async (start: Date, end: Date) => {
