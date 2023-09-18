@@ -3,16 +3,19 @@ import ReactJson from "react-json-view";
 
 import { CouncilSelect } from "@/components";
 import { useRpc } from "@/hooks";
-import { generateReport, generateReport4 } from "@/helpers";
+import { generateReport2, generateReport4 } from "@/helpers";
 import { useSelectedCouncil } from "@/store";
 import Charts from "./Charts";
+import Report1 from "./Report1";
 
 export default function Home() {
   const { council, setCouncil } = useSelectedCouncil();
   const { api, connectionState } = useRpc();
-  const [report, setReport] = useState({});
+
+  const [report2, setReport2] = useState({});
   const [report4, setReport4] = useState({});
   const [loading, setLoading] = useState(false);
+
   const [startBlock, setStartBlock] = useState(0);
   const [endBlock, setEndBlock] = useState(0);
 
@@ -29,11 +32,12 @@ export default function Home() {
     if (!api) return;
     setLoading(true);
 
-    const [report, report4] = await Promise.all([
-      generateReport(api, startBlock, endBlock),
+    const [report2, report4] = await Promise.all([
+      generateReport2(api, startBlock, endBlock),
       generateReport4(api, startBlock, endBlock),
     ]);
-    setReport(report);
+
+    setReport2(report2);
     setReport4(report4);
     setLoading(false);
   }, [api, startBlock, endBlock]);
@@ -45,8 +49,8 @@ export default function Home() {
       ) : (
         <div>{connectionState}</div>
       )}
+      <Report1 />
       <CouncilSelect council={council} onChange={setCouncil} />
-
       <label>Start block:</label>
       <input
         type="number"
@@ -67,9 +71,9 @@ export default function Home() {
         {loading ? "Generating..." : "Generate report"}
       </button>
 
-      <h4>option 2</h4>
-      <ReactJson src={report} theme="monokai" collapsed />
-      <h4>option 4</h4>
+      <h4>Weekly Report Data</h4>
+      <ReactJson src={report2} theme="monokai" collapsed />
+      <h4>Council Report Data</h4>
       <ReactJson src={report4} theme="monokai" collapsed />
       <Charts />
     </div>

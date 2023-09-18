@@ -41,6 +41,17 @@ export const getElectedCouncilById = async (
   return asElectedCouncil(council.electedCouncils[0]);
 };
 
+export const getMembershipCount = async (date: Date) => {
+  const { GetMembersCount } = getSdk(client);
+
+  const {
+    membershipsConnection: { totalCount },
+  } = await GetMembersCount({
+    where: { createdAt_lte: date },
+  });
+  return totalCount;
+};
+
 export const getWorkingGroups = async (): Promise<WorkingGroup[]> => {
   const { GetWorkingGroups } = getSdk(client);
   const workingGroups = await GetWorkingGroups();

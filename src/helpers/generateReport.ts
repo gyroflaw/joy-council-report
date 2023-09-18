@@ -14,12 +14,58 @@ import {
   getForumStatus,
   getWorkingGroupStatus,
   getFundingProposalPaid,
+  getMembershipCount,
+  getWorkingGroups,
+  getOfficialCirculatingSupply,
+  getOfficialTotalSupply,
 } from "@/api";
 import { MEXC_WALLET } from "@/config";
 import { toJoy } from "./bn";
 import { BN } from "bn.js";
 
-export async function generateReport(
+export async function generateReport1(api: ApiPromise, blockNumber: number) {
+  const blockHash = await getBlockHash(api, blockNumber);
+  const blockTimestamp = new Date(
+    (await (await api.at(blockHash)).query.timestamp.now()).toNumber()
+  );
+  const general = {
+    block: blockNumber,
+    hash: blockHash,
+    timestamp: blockTimestamp,
+  };
+
+  const totalSupply = toJoy(await getTotalSupply(api, blockHash));
+  const officialTotalSupply = await getOfficialTotalSupply();
+  const officialCirculatingSupply = await getOfficialCirculatingSupply();
+  const INITIAL_SUPPLY = 1_000_000_000;
+  const inflation =
+    ((officialTotalSupply - INITIAL_SUPPLY) / INITIAL_SUPPLY) * 100;
+
+  const supply = {
+    totalSupply,
+    officialTotalSupply,
+    officialCirculatingSupply,
+    inflation,
+  };
+
+  const totalMembership = await getMembershipCount(blockTimestamp);
+  const workingGroups = await getWorkingGroups();
+  const w = workingGroups.map((w) => ({
+    id: w.id,
+    name: w.name,
+    lead: w.leader?.membership.name,
+    budget: w.budget ? toJoy(w.budget) : undefined,
+    workers: w.workers.length,
+  }));
+  return {
+    general,
+    supply,
+    totalMembership,
+    workingGroups: w,
+  };
+}
+
+export async function generateReport2(
   api: ApiPromise,
   startBlockNumber: number,
   endBlockNumber?: number

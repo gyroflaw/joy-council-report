@@ -13,7 +13,7 @@ export default function BlockTime({ block }: BlockTimeProps) {
         block.number
       }`}
     >
-      {block.timestamp}
+      {block.timestamp.toLocaleString()}
     </a>
   );
 }
