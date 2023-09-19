@@ -67,14 +67,14 @@ export const getWorkingGroupBudget = async (start: Block, end: Block) => {
     [key in WorkingGroup["id"]]: number;
   };
   for await (const workingGroup of workingGroups) {
-    const budgets = await GetBudgetSpending({
+    const { budgetSpendingEvents } = await GetBudgetSpending({
       where: {
         group: { id_eq: workingGroup.id },
         createdAt_gte: start.timestamp,
         createdAt_lte: end.timestamp,
       },
     });
-    const budget = budgets.budgetSpendingEvents.reduce(
+    const budget = budgetSpendingEvents.reduce(
       (total, { amount }) => total.add(new BN(amount)),
       BN_ZERO
     );
@@ -183,7 +183,7 @@ export const getWorkingGroupBudget = async (start: Block, end: Block) => {
     workersSalary[workingGroup.id] = toJoy(groupSalary);
   }
 
-  return { budget, spending, leadSalary, workersSalary };
+  return { budget, discretionarySpending: spending, leadSalary, workersSalary };
 };
 
 export const getFundingProposalPaid = async (start: Date, end: Date) => {
