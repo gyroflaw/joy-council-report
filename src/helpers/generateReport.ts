@@ -10,7 +10,7 @@ import {
   getVideoNftStatus,
   getVideoStatus,
   getTotalSupply,
-  getWorkingGroupBudget,
+  getWorkingGroupSpending,
   getForumStatus,
   getWorkingGroupStatus,
   getFundingProposalPaid,
@@ -18,10 +18,12 @@ import {
   getWorkingGroups,
   getOfficialCirculatingSupply,
   getOfficialTotalSupply,
+  getWorkingGroupBudget,
 } from "@/api";
 import { MEXC_WALLET } from "@/config";
 import { toJoy } from "./bn";
 import { BN } from "bn.js";
+import { GroupIdName } from "@/types";
 
 export async function generateReport1(api: ApiPromise, blockNumber: number) {
   const blockHash = await getBlockHash(api, blockNumber);
@@ -125,20 +127,35 @@ export async function generateReport2(
       new BN(councilMembers.length * (endBlockNumber - startBlockNumber))
     )
   );
-  const workingGroupBudget = await getWorkingGroupBudget(startBlock, endBlock);
+  const workingGroupSpending = await getWorkingGroupSpending(
+    startBlock,
+    endBlock
+  );
+  const wgSpending = Object.values(
+    workingGroupSpending.discretionarySpending
+  ).reduce((a, b) => a + b, 0);
   const fundingProposals = toJoy(
     await getFundingProposalPaid(startBlockTimestamp, endBlockTimestamp)
   );
   const creatorPayoutRewards = toJoy(new BN(0));
 
-  // calc validator rewards
+  // TODO calc validator rewards
   // iterate all blocks and get validator reward per block and sum them up
+  const validatorRewards = toJoy(new BN(0));
 
   const daoSpending = {
     councilRewards,
+    wgSpending,
     fundingProposals,
     creatorPayoutRewards,
+    validatorRewards,
+    totalDaoSepnding: 0,
   };
+  const totalDaoSepnding = Object.values(daoSpending).reduce(
+    (a, b) => a + b,
+    0
+  );
+  daoSpending["totalDaoSepnding"] = totalDaoSepnding;
 
   // 6. https://github.com/0x2bc/council/blob/main/Automation_Council_and_Weekly_Reports.md#council-budget
   const councilBudget = await getCouncilBudget(
@@ -149,6 +166,36 @@ export async function generateReport2(
 
   // 7. https://github.com/0x2bc/council/blob/main/Automation_Council_and_Weekly_Reports.md#wg-budgets
   // TODO
+  const wgBudgets = (await getWorkingGroupBudget(
+    api,
+    startBlockHash,
+    endBlockHash
+  )) as {
+    [key in GroupIdName]: {
+      startBudget: number;
+      endBudget: number | undefined;
+      spending: number;
+    };
+  };
+
+  // TODO add refilled
+
+  // add spending
+  for (const spending of Object.entries(
+    workingGroupSpending.discretionarySpending
+  )) {
+    wgBudgets[spending[0] as GroupIdName]["spending"] = spending[1];
+  }
+
+  const wgSalary = {
+    leadSalary: workingGroupSpending.leadSalary,
+    workersSalary: workingGroupSpending.workersSalary,
+  };
+
+  const workingGroup = {
+    wgBudgets,
+    wgSalary,
+  };
 
   // 8. https://github.com/0x2bc/council/blob/main/Automation_Council_and_Weekly_Reports.md#videos
   const videoStatus = await getVideoStatus(
@@ -204,7 +251,7 @@ export async function generateReport2(
     },
     daoSpending,
     councilBudget,
-    workingGroupBudget,
+    workingGroup,
     videoStatus,
     nonEmptyChannelStatus,
     videoNftStatus,

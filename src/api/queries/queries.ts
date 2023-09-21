@@ -58,7 +58,7 @@ export const getWorkingGroups = async (): Promise<WorkingGroup[]> => {
   return workingGroups.workingGroups.map(asWorkingGroup);
 };
 
-export const getWorkingGroupBudget = async (
+export const getWorkingGroupSpending = async (
   start: Block & { hash: string },
   end: Block & { hash: string }
 ) => {
@@ -83,13 +83,6 @@ export const getWorkingGroupBudget = async (
     );
 
     spending[workingGroup.id] = toJoy(wgSpending);
-  }
-
-  const budget = {} as {
-    [key in WorkingGroup["id"]]: number;
-  };
-  for (const workingGroup of workingGroups) {
-    budget[workingGroup.id] = toJoy(workingGroup.budget ?? BN_ZERO);
   }
 
   const leadSalary = {} as {
@@ -186,7 +179,7 @@ export const getWorkingGroupBudget = async (
     workersSalary[workingGroup.id] = toJoy(groupSalary);
   }
 
-  return { budget, discretionarySpending: spending, leadSalary, workersSalary };
+  return { discretionarySpending: spending, leadSalary, workersSalary };
 };
 
 export const getFundingProposalPaid = async (start: Date, end: Date) => {
