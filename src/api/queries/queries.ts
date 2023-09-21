@@ -58,7 +58,10 @@ export const getWorkingGroups = async (): Promise<WorkingGroup[]> => {
   return workingGroups.workingGroups.map(asWorkingGroup);
 };
 
-export const getWorkingGroupBudget = async (start: Block, end: Block) => {
+export const getWorkingGroupBudget = async (
+  start: Block & { hash: string },
+  end: Block & { hash: string }
+) => {
   const workingGroups = await getWorkingGroups();
   const { GetBudgetSpending, getFundingProposalPaid } = getSdk(client);
 
@@ -74,12 +77,12 @@ export const getWorkingGroupBudget = async (start: Block, end: Block) => {
         createdAt_lte: end.timestamp,
       },
     });
-    const budget = budgetSpendingEvents.reduce(
+    const wgSpending = budgetSpendingEvents.reduce(
       (total, { amount }) => total.add(new BN(amount)),
       BN_ZERO
     );
 
-    spending[workingGroup.id] = toJoy(budget);
+    spending[workingGroup.id] = toJoy(wgSpending);
   }
 
   const budget = {} as {

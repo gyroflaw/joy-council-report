@@ -157,7 +157,7 @@ export async function generateReport2(
   );
 
   // 9. https://github.com/0x2bc/council/blob/main/Automation_Council_and_Weekly_Reports.md#channels
-  const channelStatus = await getChannelStatus(
+  const nonEmptyChannelStatus = await getChannelStatus(
     startBlockTimestamp,
     endBlockTimestamp
   );
@@ -206,7 +206,7 @@ export async function generateReport2(
     councilBudget,
     workingGroupBudget,
     videoStatus,
-    channelStatus,
+    nonEmptyChannelStatus,
     videoNftStatus,
     membershipStatus,
     proposals,
@@ -227,7 +227,7 @@ export async function generateReport4(
     (await (await api.at(endBlockHash)).query.timestamp.now()).toNumber()
   );
 
-  const channel = await getChannelStatus(
+  const nonEmptyChannel = await getChannelStatus(
     startBlockTimestamp,
     endBlockTimestamp
   );
@@ -254,7 +254,7 @@ export async function generateReport4(
   );
 
   return {
-    channel,
+    nonEmptyChannel,
     video,
     forum,
     proposal,
