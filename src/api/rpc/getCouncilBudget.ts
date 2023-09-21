@@ -13,7 +13,12 @@ export async function getCouncilBudget(
   const endBudget = endBlock
     ? toJoy(await (await api.at(endBlock)).query.council.budget())
     : undefined;
-  const refilledBudget = toJoy(await api.query.council.budgetIncrement());
+  const startRefilledBudget = toJoy(
+    await (await api.at(startBlock)).query.council.budgetIncrement()
+  );
+  const endRefilledBudget = endBlock
+    ? toJoy(await (await api.at(endBlock)).query.council.budgetIncrement())
+    : undefined;
 
-  return { startBudget, endBudget, refilledBudget };
+  return { startBudget, endBudget, startRefilledBudget, endRefilledBudget };
 }

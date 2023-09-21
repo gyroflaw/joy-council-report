@@ -19,6 +19,7 @@ import {
   getOfficialCirculatingSupply,
   getOfficialTotalSupply,
   getWorkingGroupBudget,
+  getWGBudgetRefills,
 } from "@/api";
 import { MEXC_WALLET } from "@/config";
 import { toJoy } from "./bn";
@@ -175,10 +176,17 @@ export async function generateReport2(
       startBudget: number;
       endBudget: number | undefined;
       spending: number;
+      refills: number;
     };
   };
 
-  // TODO add refilled
+  const refills = await getWGBudgetRefills(
+    startBlockTimestamp,
+    endBlockTimestamp
+  );
+  for (const r of Object.entries(refills)) {
+    wgBudgets[r[0] as GroupIdName]["refills"] = r[1];
+  }
 
   // add spending
   for (const spending of Object.entries(

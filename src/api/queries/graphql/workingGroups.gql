@@ -138,15 +138,6 @@ query GetBudgetSpending($where: BudgetSpendingEventWhereInput) {
   }
 }
 
-query GetBudgetRefilled($where: BudgetIncrementUpdatedEventWhereInput) {
-  budgetIncrementUpdatedEvents(where: $where) {
-    id
-    groupId
-    amount
-    createdAt
-  }
-}
-
 query GetWorkers($where: WorkerWhereInput, $offset: Int, $limit: Int) {
   workers(where: $where, offset: $offset, limit: $limit) {
     ...WorkerFields

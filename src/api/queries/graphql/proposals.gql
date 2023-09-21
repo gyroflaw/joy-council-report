@@ -10,7 +10,12 @@ query getExecutedProposalsCount($where: ProposalExecutedEventWhereInput) {
   }
 }
 
-query getProposals($where: ProposalWhereInput, $orderBy: [ProposalOrderByInput!], $limit: Int, $offset: Int) {
+query getProposals(
+  $where: ProposalWhereInput
+  $orderBy: [ProposalOrderByInput!]
+  $limit: Int
+  $offset: Int
+) {
   proposals(where: $where, orderBy: $orderBy, limit: $limit, offset: $offset) {
     ...ProposalFields
   }
@@ -25,6 +30,12 @@ fragment ProposalFields on Proposal {
   statusSetAtTime
   details {
     __typename
+    ... on UpdateWorkingGroupBudgetProposalDetails {
+      amount
+      group {
+        id
+      }
+    }
   }
   creator {
     ...MemberFields

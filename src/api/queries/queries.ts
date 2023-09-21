@@ -195,6 +195,40 @@ export const getFundingProposalPaid = async (start: Date, end: Date) => {
   return paid;
 };
 
+export const getWGBudgetRefills = async (start: Date, end: Date) => {
+  const { getProposals } = getSdk(client);
+  const refills = {} as {
+    [key in WorkingGroup["id"]]: number;
+  };
+
+  const { proposals } = await getProposals({
+    where: {
+      isFinalized_eq: true,
+      details_json: { isTypeOf_eq: "UpdateWorkingGroupBudgetProposalDetails" },
+      status_json: { isTypeOf_eq: "ProposalStatusExecuted" },
+      createdAt_gte: start,
+      createdAt_lte: end,
+    },
+  });
+
+  for (const proposal of proposals) {
+    const {
+      group: { id },
+      amount,
+    } = proposal.details as {
+      __typename: string;
+      group: {
+        id: WorkingGroup["id"];
+        __typename: string;
+      };
+      amount: string;
+    };
+    refills[id] =
+      toJoy(new BN(amount)) + (isNaN(refills[id]) ? 0 : refills[id]);
+  }
+  return refills;
+};
+
 //
 export const getVideoStatus = async (start: Date, end: Date) => {
   const { GetVideoCount } = getSdk(client);
