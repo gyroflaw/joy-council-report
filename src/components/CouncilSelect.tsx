@@ -47,7 +47,7 @@ export default function CouncilSelect({
 
   return (
     <div className="justify-content-center">
-      <h3>Choose council </h3>
+      <div>Choose council </div>
       {data ? (
         <Select
           id="council"

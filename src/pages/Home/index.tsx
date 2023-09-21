@@ -45,37 +45,41 @@ export default function Home() {
   return (
     <div className="prose max-w-3xl m-auto mt-4">
       {api ? (
-        <div>Connected to joystream node</div>
+        <div>✅ Connected to joystream node</div>
       ) : (
         <div>{connectionState}</div>
       )}
       <Report1 />
-      <CouncilSelect council={council} onChange={setCouncil} />
-      <label>Start block:</label>
-      <input
-        type="number"
-        value={startBlock}
-        onChange={(e) => setStartBlock(parseInt(e.target.value, 10))}
-      />
-      <label>End block:</label>
-      <input
-        type="number"
-        value={endBlock}
-        onChange={(e) => setEndBlock(parseInt(e.target.value, 10))}
-      />
-      <button
-        className="btn mr-0 my-5 mx-4"
-        onClick={generate}
-        disabled={!council || !api || loading}
-      >
-        {loading ? "Generating..." : "Generate report"}
-      </button>
+      <div className="rounded-sm p-2 mt-4 border-2 border-[#fff]">
+        <div className="rounded-sm p-2 border-2 border-[#fff]">
+          <CouncilSelect council={council} onChange={setCouncil} />
+          <label>Start block:</label>
+          <input
+            type="number"
+            value={startBlock}
+            onChange={(e) => setStartBlock(parseInt(e.target.value, 10))}
+          />
+          <label>End block:</label>
+          <input
+            type="number"
+            value={endBlock}
+            onChange={(e) => setEndBlock(parseInt(e.target.value, 10))}
+          />
+          <button
+            className="btn mr-0 my-5 mx-4"
+            onClick={generate}
+            disabled={!council || !api || loading}
+          >
+            {loading ? "Generating..." : "Generate report"}
+          </button>
+        </div>
 
-      <h4>Weekly Report Data</h4>
-      <ReactJson src={report2} theme="monokai" collapsed />
-      <h4>Council Report Data</h4>
-      <ReactJson src={report4} theme="monokai" collapsed />
-      <Charts />
+        <h4>Weekly Report Data</h4>
+        <ReactJson src={report2} theme="monokai" collapsed />
+        <h4>Council Report Data</h4>
+        <ReactJson src={report4} theme="monokai" collapsed />
+        <Charts />
+      </div>
     </div>
   );
 }

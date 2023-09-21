@@ -35,23 +35,25 @@ export default function Report1() {
   }, [api, block]);
 
   return (
-    <div className="prose max-w-3xl m-auto mt-4">
-      <div>
-        Current block number: {currentBlock ? currentBlock : "Loading..."}
+    <div className="prose max-w-3xl m-auto mt-4 rounded-sm p-2 border-2 border-[#fff]">
+      <div className="rounded-sm p-2 mt-4 border-2 border-[#fff]">
+        <div>
+          Current block number: {currentBlock ? currentBlock : "Loading..."}
+        </div>
+        <label>Block:</label>
+        <input
+          type="number"
+          value={block}
+          onChange={(e) => setBlock(parseInt(e.target.value, 10))}
+        />
+        <button
+          className="btn mr-0 my-5 mx-4"
+          onClick={generate}
+          disabled={!api || loading}
+        >
+          {loading ? "Generating..." : "Generate report"}
+        </button>
       </div>
-      <label>Block:</label>
-      <input
-        type="number"
-        value={block}
-        onChange={(e) => setBlock(parseInt(e.target.value, 10))}
-      />
-      <button
-        className="btn mr-0 my-5 mx-4"
-        onClick={generate}
-        disabled={!api || loading}
-      >
-        {loading ? "Generating..." : "Generate report"}
-      </button>
       <h4>Given Block Stats</h4>
       <ReactJson src={report1} theme="monokai" collapsed />
     </div>
