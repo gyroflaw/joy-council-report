@@ -68,7 +68,7 @@ export default function Home() {
           <button
             className="btn mr-0 my-5 mx-4"
             onClick={generate}
-            disabled={!council || !api || loading}
+            disabled={!api || loading}
           >
             {loading ? "Generating..." : "Generate report"}
           </button>
