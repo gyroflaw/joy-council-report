@@ -52,17 +52,17 @@ export const getMembershipCount = async (date: Date) => {
   return totalCount;
 };
 
-export const getWorkingGroups = async (): Promise<WorkingGroup[]> => {
+export const getCurrentWorkingGroups = async (): Promise<WorkingGroup[]> => {
   const { GetWorkingGroups } = getSdk(client);
-  const workingGroups = await GetWorkingGroups();
-  return workingGroups.workingGroups.map(asWorkingGroup);
+  const { workingGroups } = await GetWorkingGroups();
+  return workingGroups.map(asWorkingGroup);
 };
 
 export const getWorkingGroupSpending = async (
   start: Block & { hash: string },
   end: Block & { hash: string }
 ) => {
-  const workingGroups = await getWorkingGroups();
+  const workingGroups = await getCurrentWorkingGroups();
   const { GetBudgetSpending, getFundingProposalPaid } = getSdk(client);
 
   // calculate working group budgets
@@ -694,7 +694,7 @@ export const getStorageChartData = async (start: Date, end: Date) => {
     );
     data.push({
       date: date,
-      count: parseFloat((size / 1000 / 1000).toFixed(2)),
+      count: parseFloat((size / 1024 / 1024).toFixed(2)),
     });
   }
 

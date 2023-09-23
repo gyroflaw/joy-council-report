@@ -6,11 +6,8 @@ export async function getTotalSupply(
   api: ApiPromise,
   blockHash?: HexString
 ): Promise<BN> {
-  let _api = api;
-  if (blockHash) {
-    // @ts-ignore
-    _api = await api.at(blockHash);
-  }
+  const _api = blockHash ? await api.at(blockHash) : api;
+
   const total = await _api.query.balances.totalIssuance();
   return total;
 }

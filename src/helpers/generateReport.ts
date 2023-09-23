@@ -15,18 +15,25 @@ import {
   getWorkingGroupStatus,
   getFundingProposalPaid,
   getMembershipCount,
-  getWorkingGroups,
   getOfficialCirculatingSupply,
   getOfficialTotalSupply,
   getWorkingGroupBudget,
   getWGBudgetRefills,
+  client as graphQLClient,
+  getSdk,
+  getWorkingGroups,
+  getStorageStatus,
 } from "@/api";
 import { MEXC_WALLET } from "@/config";
 import { toJoy } from "./bn";
 import { BN } from "bn.js";
 import { GroupIdName } from "@/types";
 
+const INITIAL_SUPPLY = 1_000_000_000;
+
 export async function generateReport1(api: ApiPromise, blockNumber: number) {
+  const { GetVideoCount, GetChannelsCount, GetNftIssuedCount, GetMembers } =
+    getSdk(graphQLClient);
   const blockHash = await getBlockHash(api, blockNumber);
   const blockTimestamp = new Date(
     (await (await api.at(blockHash)).query.timestamp.now()).toNumber()
@@ -37,37 +44,82 @@ export async function generateReport1(api: ApiPromise, blockNumber: number) {
     timestamp: blockTimestamp,
   };
 
+  const {
+    videosConnection: { totalCount: videoCount },
+  } = await GetVideoCount({
+    where: { createdAt_lte: blockTimestamp },
+  });
+
+  const {
+    channelsConnection: { totalCount: channelCount },
+  } = await GetChannelsCount({
+    where: {
+      createdAt_lte: blockTimestamp,
+    },
+  });
+  const {
+    channelsConnection: { totalCount: nonEmptyChannelCount },
+  } = await GetChannelsCount({
+    where: {
+      createdAt_lte: blockTimestamp,
+      totalVideosCreated_gt: 0,
+    },
+  });
+  // TODO: Total storage
+  const {
+    nftIssuedEventsConnection: { totalCount: nftCount },
+  } = await GetNftIssuedCount({
+    where: { createdAt_lte: blockTimestamp },
+  });
+
+  const content = {
+    videoCount,
+    channelCount,
+    nonEmptyChannelCount,
+    nftCount,
+  };
+
   const totalSupply = toJoy(await getTotalSupply(api, blockHash));
-  const officialTotalSupply = await getOfficialTotalSupply();
-  const officialCirculatingSupply = await getOfficialCirculatingSupply();
-  const INITIAL_SUPPLY = 1_000_000_000;
-  const inflation =
-    ((officialTotalSupply - INITIAL_SUPPLY) / INITIAL_SUPPLY) * 100;
+  const currentTotalSupply = await getOfficialTotalSupply();
+  const currentCirculatingSupply = await getOfficialCirculatingSupply();
+
+  const inflation = ((totalSupply - INITIAL_SUPPLY) / INITIAL_SUPPLY) * 100;
 
   const supply = {
     totalSupply,
-    officialTotalSupply,
-    officialCirculatingSupply,
+    currentTotalSupply,
+    currentCirculatingSupply,
     inflation,
   };
 
   const totalMembership = await getMembershipCount(blockTimestamp);
-  const workingGroups = await getWorkingGroups();
-  const w = workingGroups.map((w) => ({
-    id: w.id,
-    name: w.name,
-    lead: w.leader?.membership.name,
-    budget: w.budget ? toJoy(w.budget) : undefined,
-    workers: w.workers.length,
-  }));
+  const workingGroups = await getWorkingGroups(api, blockHash);
+
+  const { memberships } = await GetMembers({
+    where: {
+      id_in: workingGroups.map((w) => w.leadMemebership?.toString() || ""),
+    },
+  });
+  workingGroups.forEach((wg, idx) => {
+    workingGroups[idx] = {
+      ...workingGroups[idx],
+      // @ts-ignore
+      leadMemebership: memberships.find(
+        (m) => m.id === workingGroups[idx].leadMemebership?.toString()
+      )?.handle,
+    };
+  });
+
   return {
     general,
+    content,
     supply,
     totalMembership,
-    workingGroups: w,
+    workingGroups,
   };
 }
 
+// weekly report
 export async function generateReport2(
   api: ApiPromise,
   startBlockNumber: number,
@@ -106,8 +158,8 @@ export async function generateReport2(
 
   // 2. https://github.com/0x2bc/council/blob/main/Automation_Council_and_Weekly_Reports.md#issuance
   const startIssuance = toJoy(await getTotalSupply(api, startBlockHash));
-  // current issuance
   const endIssuance = toJoy(await getTotalSupply(api, endBlockHash));
+  const issuanceChange = endIssuance - startIssuance;
 
   // 3. https://github.com/0x2bc/council/blob/main/Automation_Council_and_Weekly_Reports.md#mexc-exchange-wallet
   const startBalance = toJoy(
@@ -117,7 +169,15 @@ export async function generateReport2(
   const mexcBalChange = endBalance - startBalance;
 
   // 4. https://github.com/0x2bc/council/blob/main/Automation_Council_and_Weekly_Reports.md#supply-1
-  // TODO
+
+  const startInflation =
+    ((startIssuance - INITIAL_SUPPLY) / INITIAL_SUPPLY) * 100;
+  const endInflation = ((endIssuance - INITIAL_SUPPLY) / INITIAL_SUPPLY) * 100;
+  const inflationChange = endInflation - startInflation;
+  // TODO mited/burned
+  const supply = {
+    inflationChange,
+  };
 
   // 5. https://github.com/0x2bc/council/blob/main/Automation_Council_and_Weekly_Reports.md#dao-spending
   // TODO: Check council rewards
@@ -166,7 +226,6 @@ export async function generateReport2(
   );
 
   // 7. https://github.com/0x2bc/council/blob/main/Automation_Council_and_Weekly_Reports.md#wg-budgets
-  // TODO
   const wgBudgets = (await getWorkingGroupBudget(
     api,
     startBlockHash,
@@ -243,6 +302,10 @@ export async function generateReport2(
     councilApprovals: p.councilApprovals,
   }));
 
+  const executedProposals = proposals.filter((p) => p.status === "executed");
+  const notPassedProposals = proposals.filter((p) => p.status === "expired");
+  const underReviewProposals = proposals.filter((p) => p.status === "deciding");
+
   return {
     general: {
       startBlock,
@@ -251,12 +314,14 @@ export async function generateReport2(
     issuance: {
       startIssuance,
       endIssuance,
+      issuanceChange,
     },
     mexc: {
       startBalance,
       endBalance,
       mexcBalChange,
     },
+    supply,
     daoSpending,
     councilBudget,
     workingGroup,
@@ -264,10 +329,16 @@ export async function generateReport2(
     nonEmptyChannelStatus,
     videoNftStatus,
     membershipStatus,
-    proposals,
+    proposals: {
+      proposals,
+      executedProposals,
+      notPassedProposals,
+      underReviewProposals,
+    },
   };
 }
 
+// Council report
 export async function generateReport4(
   api: ApiPromise,
   startBlockNumber: number,
@@ -289,6 +360,13 @@ export async function generateReport4(
 
   const video = await getVideoStatus(startBlockTimestamp, endBlockTimestamp);
 
+  // TODO: storage
+  const totalStorageUsed = 0;
+  const storageChanged = await getStorageStatus(
+    startBlockTimestamp,
+    endBlockTimestamp
+  );
+
   const forum = await getForumStatus(startBlockTimestamp, endBlockTimestamp);
 
   const proposals = await getProposals(startBlockTimestamp, endBlockTimestamp);
@@ -308,9 +386,69 @@ export async function generateReport4(
     endBlockTimestamp
   );
 
+  const councilBudget = await getCouncilBudget(
+    api,
+    startBlockHash,
+    endBlockHash
+  );
+
+  // 7. https://github.com/0x2bc/council/blob/main/Automation_Council_and_Weekly_Reports.md#wg-budgets
+  const wgBudgets = (await getWorkingGroupBudget(
+    api,
+    startBlockHash,
+    endBlockHash
+  )) as {
+    [key in GroupIdName]: {
+      startBudget: number;
+      endBudget: number | undefined;
+      spending: number;
+      refills: number;
+    };
+  };
+
+  const refills = await getWGBudgetRefills(
+    startBlockTimestamp,
+    endBlockTimestamp
+  );
+  for (const r of Object.entries(refills)) {
+    wgBudgets[r[0] as GroupIdName]["refills"] = r[1];
+  }
+  const startBlock = {
+    number: startBlockNumber,
+    hash: startBlockHash,
+    timestamp: startBlockTimestamp,
+  };
+  const endBlock = {
+    number: endBlockNumber,
+    hash: endBlockHash,
+    timestamp: endBlockTimestamp,
+  };
+
+  const workingGroupSpending = await getWorkingGroupSpending(
+    startBlock,
+    endBlock
+  );
+  const _wgSpending = Object.values(
+    workingGroupSpending.discretionarySpending
+  ).reduce((a, b) => a + b, 0);
+  // add spending
+  for (const spending of Object.entries(
+    workingGroupSpending.discretionarySpending
+  )) {
+    wgBudgets[spending[0] as GroupIdName]["spending"] = spending[1];
+  }
+  // TODO council & wg available budget
+
   return {
     nonEmptyChannel,
     video,
+    // unit GB
+    storage: {
+      totalStorageUsed,
+      storageChanged: storageChanged / 1024 / 1024 / 1024,
+    },
+    councilBudget,
+    wgBudgets,
     forum,
     proposal,
     membership,
