@@ -17,7 +17,7 @@ import {
   getMembershipChartData,
   getStorageChartData,
 } from "@/api";
-import { useSelectedCouncil } from "@/store";
+import { useRpc } from "@/hooks";
 
 type DailyData = {
   date: Date;
@@ -49,43 +49,51 @@ function JoyChart({ data, title }: { data: DailyData[]; title: string }) {
   );
 }
 
-export default function Charts() {
-  const { council } = useSelectedCouncil();
+export default function Charts({ start, end }: { start: number; end: number }) {
+  const [startTimestamp, setStartTimestamp] = useState<Date | undefined>(
+    undefined
+  );
+  const [endTimestamp, setEndTimestamp] = useState<Date | undefined>(undefined);
   const [videoData, setVideoData] = useState<DailyData[]>([]);
   const [videoNftData, setVideoNftData] = useState<DailyData[]>([]);
   const [channelData, setChannelData] = useState<DailyData[]>([]);
   const [membershipData, setMembershipData] = useState<DailyData[]>([]);
   const [storageData, setStorageData] = useState<DailyData[]>([]);
+
+  const { api } = useRpc();
+
   useEffect(() => {
+    if (!api) return;
+
     (async () => {
-      if (!council) return;
-
-      getVideoChartData(
-        new Date(council.electedAt.timestamp),
-        council.endedAt ? new Date(council.endedAt.timestamp) : new Date()
-      ).then(setVideoData);
-
-      getVideoNftChartData(
-        new Date(council.electedAt.timestamp),
-        council.endedAt ? new Date(council.endedAt.timestamp) : new Date()
-      ).then(setVideoNftData);
-
-      getChannelChartData(
-        new Date(council.electedAt.timestamp),
-        council.endedAt ? new Date(council.endedAt.timestamp) : new Date()
-      ).then(setChannelData);
-
-      getMembershipChartData(
-        new Date(council.electedAt.timestamp),
-        council.endedAt ? new Date(council.endedAt.timestamp) : new Date()
-      ).then(setMembershipData);
-
-      getStorageChartData(
-        new Date(council.electedAt.timestamp),
-        council.endedAt ? new Date(council.endedAt.timestamp) : new Date()
-      ).then(setStorageData);
+      const startHash = await api.rpc.chain.getBlockHash(start);
+      const startTimestamp = new Date(
+        (await (await api.at(startHash)).query.timestamp.now()).toNumber()
+      );
+      setStartTimestamp(startTimestamp);
+      const endHash = await api.rpc.chain.getBlockHash(end);
+      const endTimestamp = new Date(
+        (await (await api.at(endHash)).query.timestamp.now()).toNumber()
+      );
+      setEndTimestamp(endTimestamp);
     })();
-  }, [council]);
+  }, [api, start, end]);
+
+  useEffect(() => {
+    if (!startTimestamp || !endTimestamp) return;
+
+    getVideoChartData(startTimestamp, endTimestamp).then(setVideoData);
+
+    getVideoNftChartData(startTimestamp, endTimestamp).then(setVideoNftData);
+
+    getChannelChartData(startTimestamp, endTimestamp).then(setChannelData);
+
+    getMembershipChartData(startTimestamp, endTimestamp).then(
+      setMembershipData
+    );
+
+    getStorageChartData(startTimestamp, endTimestamp).then(setStorageData);
+  }, [startTimestamp, endTimestamp]);
 
   return (
     <div>
