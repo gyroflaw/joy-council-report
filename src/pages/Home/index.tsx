@@ -78,7 +78,7 @@ export default function Home() {
         <ReactJson src={report2} theme="monokai" collapsed />
         <h4>Council Report Data</h4>
         <ReactJson src={report4} theme="monokai" collapsed />
-        <Charts start={startBlock} end={startBlock} />
+        <Charts start={startBlock} end={endBlock} />
       </div>
     </div>
   );

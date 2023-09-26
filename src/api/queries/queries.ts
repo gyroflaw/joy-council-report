@@ -257,8 +257,10 @@ export const getVideoStatus = async (start: Date, end: Date) => {
 export const getVideoChartData = async (start: Date, end: Date) => {
   const { GetVideoCount } = getSdk(client);
 
-  const startDate = new Date(start.toDateString());
-  const endDate = new Date(end.toDateString());
+  const startDate = new Date(
+    `${start.toISOString().slice(0, 11)}00:00:00.000Z`
+  );
+  const endDate = new Date(`${end.toISOString().slice(0, 11)}00:00:00.000Z`);
 
   // iterate over days
   const data = [];
@@ -320,8 +322,10 @@ export const getChannelStatus = async (start: Date, end: Date) => {
 export const getChannelChartData = async (start: Date, end: Date) => {
   const { GetChannelsCount } = getSdk(client);
 
-  const startDate = new Date(start.toDateString());
-  const endDate = new Date(end.toDateString());
+  const startDate = new Date(
+    `${start.toISOString().slice(0, 11)}00:00:00.000Z`
+  );
+  const endDate = new Date(`${end.toISOString().slice(0, 11)}00:00:00.000Z`);
 
   // iterate over days
   const data = [];
@@ -407,8 +411,10 @@ export const getVideoNftStatus = async (start: Date, end: Date) => {
 export const getVideoNftChartData = async (start: Date, end: Date) => {
   const { GetNftIssuedCount } = getSdk(client);
 
-  const startDate = new Date(start.toDateString());
-  const endDate = new Date(end.toDateString());
+  const startDate = new Date(
+    `${start.toISOString().slice(0, 11)}00:00:00.000Z`
+  );
+  const endDate = new Date(`${end.toISOString().slice(0, 11)}00:00:00.000Z`);
 
   // iterate over days
   const data = [];
@@ -466,8 +472,10 @@ export const getMembershipStatus = async (start: Date, end: Date) => {
 export const getMembershipChartData = async (start: Date, end: Date) => {
   const { GetMembersCount } = getSdk(client);
 
-  const startDate = new Date(start.toDateString());
-  const endDate = new Date(end.toDateString());
+  const startDate = new Date(
+    `${start.toISOString().slice(0, 11)}00:00:00.000Z`
+  );
+  const endDate = new Date(`${end.toISOString().slice(0, 11)}00:00:00.000Z`);
 
   // iterate over days
   const data = [];
@@ -596,68 +604,48 @@ export const getForumStatus = async (start: Date, end: Date) => {
 };
 
 export const getWorkingGroupStatus = async (start: Date, end: Date) => {
+  // TODO fix count
   const {
     GetWorkingGroupOpenings,
     GetWorkingGroupApplications,
     GetOpeningFilledEventsConnection,
     GetTerminatedWorkerEventsConnection,
+    GetWorkerExitedEventsConnection,
   } = getSdk(client);
 
-  const { workingGroupOpenings: startOpenings } = await GetWorkingGroupOpenings(
-    {
-      where: { createdAt_lte: start },
-    }
-  );
-  const { workingGroupOpenings: endOpenings } = await GetWorkingGroupOpenings({
-    where: { createdAt_lte: end },
+  const { workingGroupOpenings: openings } = await GetWorkingGroupOpenings({
+    where: { createdAt_gte: start, createdAt_lte: end },
   });
 
-  const { workingGroupApplications: startApplications } =
+  const { workingGroupApplications: applications } =
     await GetWorkingGroupApplications({
-      where: { createdAt_lte: start },
-    });
-  const { workingGroupApplications: endApplications } =
-    await GetWorkingGroupApplications({
-      where: { createdAt_lte: end },
+      where: { createdAt_gte: start, createdAt_lte: end },
     });
 
   const {
-    openingFilledEventsConnection: { totalCount: startFilledCount },
+    openingFilledEventsConnection: { totalCount: filledCount },
   } = await GetOpeningFilledEventsConnection({
-    where: { createdAt_lte: start },
+    where: { createdAt_gte: start, createdAt_lte: end },
   });
-  const {
-    openingFilledEventsConnection: { totalCount: endFilledCount },
-  } = await GetOpeningFilledEventsConnection({
-    where: { createdAt_lte: end },
-  });
-  const filledCount = endFilledCount - startFilledCount;
 
   const {
-    terminatedWorkerEventsConnection: { totalCount: startTerminatedCount },
+    terminatedWorkerEventsConnection: { totalCount: terminatedCount },
   } = await GetTerminatedWorkerEventsConnection({
-    where: { createdAt_lte: start },
+    where: { createdAt_gte: start, createdAt_lte: end },
   });
-  const {
-    terminatedWorkerEventsConnection: { totalCount: endTerminatedCount },
-  } = await GetTerminatedWorkerEventsConnection({
-    where: { createdAt_lte: end },
-  });
-  const terminatedCount = endTerminatedCount - startTerminatedCount;
 
-  // TODO: Left count
+  const {
+    workerExitedEventsConnection: { totalCount: leftCount },
+  } = await GetWorkerExitedEventsConnection({
+    where: { createdAt_gte: start, createdAt_lte: end },
+  });
 
   return {
-    openings: {
-      startCount: startOpenings.length,
-      endCount: endOpenings.length,
-    },
-    applications: {
-      startCount: startApplications.length,
-      endCount: endApplications.length,
-    },
+    openings: openings.length,
+    applications: applications.length,
     filledCount,
     terminatedCount,
+    leftCount,
   };
 };
 

@@ -71,7 +71,9 @@ export default function Charts({ start, end }: { start: number; end: number }) {
         (await (await api.at(startHash)).query.timestamp.now()).toNumber()
       );
       setStartTimestamp(startTimestamp);
-      const endHash = await api.rpc.chain.getBlockHash(end);
+      const endHash = await api.rpc.chain.getBlockHash(
+        end === 0 ? undefined : end
+      );
       const endTimestamp = new Date(
         (await (await api.at(endHash)).query.timestamp.now()).toNumber()
       );

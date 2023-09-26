@@ -27,7 +27,7 @@ import {
 import { MEXC_WALLET } from "@/config";
 import { toJoy } from "./bn";
 import { BN } from "bn.js";
-import { GroupIdName } from "@/types";
+import { GroupIdName, ProposalStatus } from "@/types";
 
 const INITIAL_SUPPLY = 1_000_000_000;
 
@@ -303,8 +303,28 @@ export async function generateReport2(
   }));
 
   const executedProposals = proposals.filter((p) => p.status === "executed");
-  const notPassedProposals = proposals.filter((p) => p.status === "expired");
-  const underReviewProposals = proposals.filter((p) => p.status === "deciding");
+
+  const notPassedStatuses: ProposalStatus[] = [
+    "vetoed",
+    "executionFailed",
+    "slashed",
+    "rejected",
+    "expired",
+    "cancelled",
+    "canceledByRuntime",
+  ];
+  const notPassedProposals = proposals.filter((p) =>
+    notPassedStatuses.includes(p.status)
+  );
+
+  const underReviewStatuses: ProposalStatus[] = [
+    "deciding",
+    "gracing",
+    "dormant",
+  ];
+  const underReviewProposals = proposals.filter((p) =>
+    underReviewStatuses.includes(p.status)
+  );
 
   return {
     general: {
