@@ -165,7 +165,7 @@ export async function generateReport2(
   const startBalance = toJoy(
     await getBalance(api, MEXC_WALLET, startBlockHash)
   );
-  const endBalance = toJoy(await getBalance(api, MEXC_WALLET));
+  const endBalance = toJoy(await getBalance(api, MEXC_WALLET, endBlockHash));
   const mexcBalChange = endBalance - startBalance;
 
   // 4. https://github.com/0x2bc/council/blob/main/Automation_Council_and_Weekly_Reports.md#supply-1
