@@ -8,3 +8,51 @@ query GetNftSaleCount($where: NftBoughtEventWhereInput) {
     totalCount
   }
 }
+
+query GetNftSales(
+  $where: NftBoughtEventWhereInput
+  $orderBy: [NftBoughtEventOrderByInput!]
+  $offset: Int
+  $limit: Int
+) {
+  nftBoughtEvents(
+    offset: $offset
+    limit: $limit
+    where: $where
+    orderBy: $orderBy
+  ) {
+    ...NftBoughtEventField
+  }
+}
+
+fragment NftBoughtEventField on NftBoughtEvent {
+  videoId
+  memberId
+  price
+}
+
+query GetAuctions(
+  $offset: Int
+  $limit: Int
+  $where: AuctionWhereInput
+  $orderBy: [AuctionOrderByInput!]
+) {
+  auctions(offset: $offset, limit: $limit, where: $where, orderBy: $orderBy) {
+    nftId
+    winningMemberId
+    startingPrice
+    buyNowPrice
+    isCanceled
+    isCompleted
+    topBid {
+      ...BidField
+    }
+  }
+}
+
+fragment BidField on Bid {
+  bidderId
+  nftId
+  amount
+  isCanceled
+}

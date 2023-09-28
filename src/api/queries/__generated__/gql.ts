@@ -37417,6 +37417,30 @@ export type GetNftSaleCountQueryVariables = Exact<{
 
 export type GetNftSaleCountQuery = { __typename: 'Query', nftBoughtEventsConnection: { __typename: 'NftBoughtEventConnection', totalCount: number } };
 
+export type GetNftSalesQueryVariables = Exact<{
+  where?: InputMaybe<NftBoughtEventWhereInput>;
+  orderBy?: InputMaybe<Array<NftBoughtEventOrderByInput> | NftBoughtEventOrderByInput>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetNftSalesQuery = { __typename: 'Query', nftBoughtEvents: Array<{ __typename: 'NftBoughtEvent', videoId: string, memberId: string, price: string }> };
+
+export type NftBoughtEventFieldFragment = { __typename: 'NftBoughtEvent', videoId: string, memberId: string, price: string };
+
+export type GetAuctionsQueryVariables = Exact<{
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  where?: InputMaybe<AuctionWhereInput>;
+  orderBy?: InputMaybe<Array<AuctionOrderByInput> | AuctionOrderByInput>;
+}>;
+
+
+export type GetAuctionsQuery = { __typename: 'Query', auctions: Array<{ __typename: 'Auction', nftId: string, winningMemberId?: string | null, startingPrice: string, buyNowPrice?: string | null, isCanceled: boolean, isCompleted: boolean, topBid?: { __typename: 'Bid', bidderId: string, nftId: string, amount: string, isCanceled: boolean } | null }> };
+
+export type BidFieldFragment = { __typename: 'Bid', bidderId: string, nftId: string, amount: string, isCanceled: boolean };
+
 export type GetCreatedProposalsCountQueryVariables = Exact<{
   where?: InputMaybe<ProposalCreatedEventWhereInput>;
 }>;
@@ -37934,6 +37958,21 @@ export const ElectionRoundFieldsFragmentDoc = gql`
   }
 }
     `;
+export const NftBoughtEventFieldFragmentDoc = gql`
+    fragment NftBoughtEventField on NftBoughtEvent {
+  videoId
+  memberId
+  price
+}
+    `;
+export const BidFieldFragmentDoc = gql`
+    fragment BidField on Bid {
+  bidderId
+  nftId
+  amount
+  isCanceled
+}
+    `;
 export const ProposalFieldsFragmentDoc = gql`
     fragment ProposalFields on Proposal {
   id
@@ -38405,6 +38444,33 @@ export const GetNftSaleCountDocument = gql`
   }
 }
     `;
+export const GetNftSalesDocument = gql`
+    query GetNftSales($where: NftBoughtEventWhereInput, $orderBy: [NftBoughtEventOrderByInput!], $offset: Int, $limit: Int) {
+  nftBoughtEvents(
+    offset: $offset
+    limit: $limit
+    where: $where
+    orderBy: $orderBy
+  ) {
+    ...NftBoughtEventField
+  }
+}
+    ${NftBoughtEventFieldFragmentDoc}`;
+export const GetAuctionsDocument = gql`
+    query GetAuctions($offset: Int, $limit: Int, $where: AuctionWhereInput, $orderBy: [AuctionOrderByInput!]) {
+  auctions(offset: $offset, limit: $limit, where: $where, orderBy: $orderBy) {
+    nftId
+    winningMemberId
+    startingPrice
+    buyNowPrice
+    isCanceled
+    isCompleted
+    topBid {
+      ...BidField
+    }
+  }
+}
+    ${BidFieldFragmentDoc}`;
 export const GetCreatedProposalsCountDocument = gql`
     query getCreatedProposalsCount($where: ProposalCreatedEventWhereInput) {
   proposalCreatedEventsConnection(where: $where) {
@@ -38833,6 +38899,12 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     GetNftSaleCount(variables?: GetNftSaleCountQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetNftSaleCountQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetNftSaleCountQuery>(GetNftSaleCountDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'GetNftSaleCount', 'query');
+    },
+    GetNftSales(variables?: GetNftSalesQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetNftSalesQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetNftSalesQuery>(GetNftSalesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'GetNftSales', 'query');
+    },
+    GetAuctions(variables?: GetAuctionsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetAuctionsQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetAuctionsQuery>(GetAuctionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'GetAuctions', 'query');
     },
     getCreatedProposalsCount(variables?: GetCreatedProposalsCountQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetCreatedProposalsCountQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetCreatedProposalsCountQuery>(GetCreatedProposalsCountDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getCreatedProposalsCount', 'query');
