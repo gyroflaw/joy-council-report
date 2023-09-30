@@ -385,7 +385,8 @@ export const getMediaStatus = async (start: Date, end: Date) => {
 };
 
 export const getVideoNftStatus = async (start: Date, end: Date) => {
-  const { GetNftIssuedCount, GetNftSales, GetAuctions } = getSdk(client);
+  const { GetNftIssuedCount, GetNftSales, GetNftSaleCount, GetAuctions } =
+    getSdk(client);
 
   const {
     nftIssuedEventsConnection: { totalCount: startCount },
@@ -422,12 +423,19 @@ export const getVideoNftStatus = async (start: Date, end: Date) => {
 
   totalVolume = totalVolume.add(auctionVolume);
 
+  const {
+    nftBoughtEventsConnection: { totalCount },
+  } = await GetNftSaleCount({
+    where: { createdAt_gte: start, createdAt_lte: end },
+  });
+
   return {
     startCount,
     endCount,
     growthCount,
     growthPercent,
     saleVolume: toJoy(totalVolume),
+    saleQuantity: totalCount,
   };
 };
 
