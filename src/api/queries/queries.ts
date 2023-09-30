@@ -635,7 +635,6 @@ export const getForumStatus = async (start: Date, end: Date) => {
 };
 
 export const getWorkingGroupStatus = async (start: Date, end: Date) => {
-  // TODO fix count
   const {
     GetWorkingGroupOpenings,
     GetWorkingGroupApplications,
@@ -644,8 +643,19 @@ export const getWorkingGroupStatus = async (start: Date, end: Date) => {
     GetWorkerExitedEventsConnection,
   } = getSdk(client);
 
-  const { workingGroupOpenings: openings } = await GetWorkingGroupOpenings({
-    where: { createdAt_gte: start, createdAt_lte: end },
+  const { workingGroupOpenings: startOpenings } = await GetWorkingGroupOpenings(
+    {
+      where: {
+        createdAt_lte: start,
+        status_json: { isTypeOf_eq: "OpeningStatusOpen" },
+      },
+    }
+  );
+  const { workingGroupOpenings: endOpenings } = await GetWorkingGroupOpenings({
+    where: {
+      createdAt_lte: end,
+      status_json: { isTypeOf_eq: "OpeningStatusOpen" },
+    },
   });
 
   const { workingGroupApplications: applications } =
@@ -672,7 +682,8 @@ export const getWorkingGroupStatus = async (start: Date, end: Date) => {
   });
 
   return {
-    openings: openings.length,
+    openings: endOpenings.length,
+    openingsChange: endOpenings.length - startOpenings.length,
     applications: applications.length,
     filledCount,
     terminatedCount,
