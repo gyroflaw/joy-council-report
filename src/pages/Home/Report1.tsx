@@ -36,6 +36,7 @@ export default function Report1() {
 
   return (
     <div className="prose max-w-3xl m-auto mt-4 rounded-sm p-2 border-2 border-[#fff]">
+      <h3>Given Block Stats</h3>
       <div className="rounded-sm p-2 mt-4 border-2 border-[#fff]">
         <div>
           Current block number: {currentBlock ? currentBlock : "Loading..."}
@@ -54,7 +55,7 @@ export default function Report1() {
           {loading ? "Generating..." : "Generate report"}
         </button>
       </div>
-      <h4>Given Block Stats</h4>
+
       <ReactJson src={report1} theme="monokai" collapsed />
     </div>
   );

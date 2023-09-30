@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   BarChart,
   CartesianGrid,
@@ -25,25 +25,25 @@ type DailyData = {
 };
 
 function JoyChart({ data, title }: { data: DailyData[]; title: string }) {
+  if (data.length === 0) return <></>;
+
   return (
-    <div className="p-4">
+    <div className="p-2">
       <h3>{title}</h3>
-      {data.length > 0 && (
-        <BarChart width={730} height={250} data={data}>
-          <CartesianGrid strokeDasharray="3 3" horizontal vertical={false} />
-          <XAxis
-            dataKey="date"
-            tickFormatter={(val: Date) => {
-              const date = val.toLocaleDateString("en-US");
-              return date.slice(0, date.length - 5);
-            }}
-          />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Bar dataKey="count" fill="#8884d8" name={title} />
-        </BarChart>
-      )}
+      <BarChart width={730} height={250} data={data}>
+        <CartesianGrid strokeDasharray="3 3" horizontal vertical={false} />
+        <XAxis
+          dataKey="date"
+          tickFormatter={(val: Date) => {
+            const date = val.toLocaleDateString("en-US");
+            return date.slice(0, date.length - 5);
+          }}
+        />
+        <YAxis />
+        <Tooltip />
+        <Legend />
+        <Bar dataKey="count" fill="#8884d8" name={title} />
+      </BarChart>
       <ReactJson src={{ title, data }} theme="monokai" collapsed />
     </div>
   );
@@ -59,6 +59,7 @@ export default function Charts({ start, end }: { start: number; end: number }) {
   const [channelData, setChannelData] = useState<DailyData[]>([]);
   const [membershipData, setMembershipData] = useState<DailyData[]>([]);
   const [storageData, setStorageData] = useState<DailyData[]>([]);
+  const [loading] = useState(false);
 
   const { api } = useRpc();
 
@@ -81,7 +82,7 @@ export default function Charts({ start, end }: { start: number; end: number }) {
     })();
   }, [api, start, end]);
 
-  useEffect(() => {
+  const generate = useCallback(() => {
     if (!startTimestamp || !endTimestamp) return;
 
     getVideoChartData(startTimestamp, endTimestamp).then(setVideoData);
@@ -99,6 +100,13 @@ export default function Charts({ start, end }: { start: number; end: number }) {
 
   return (
     <div>
+      <button
+        className="btn mr-0 my-5 mx-4"
+        onClick={generate}
+        disabled={!api || loading}
+      >
+        {loading ? "Generating..." : "Generate Chart"}
+      </button>
       <JoyChart data={videoData} title="Videos" />
       <JoyChart data={videoNftData} title="Video NFTs" />
       <JoyChart data={channelData} title="Non-empty channels" />
